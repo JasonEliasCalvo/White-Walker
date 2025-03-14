@@ -1,12 +1,10 @@
 using UnityEngine;
 
-public abstract class Ataque : ScriptableObject
+public abstract class Combate<TEnum>: ScriptableObject
 {
     [Header("Datos del Ataque")]
 
-    [HideInInspector]
-    public CategoriaAtaque categoria;
-
+    public TEnum tipo;
     public string nombre;
     public string animacionAtacante;
     public string animacionDefensor;
