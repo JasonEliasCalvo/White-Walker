@@ -7,10 +7,13 @@ public class GameManager : MonoBehaviour
     public delegate void DelegatedGameStates();
     public DelegatedGameStates eventGameStart;
     public DelegatedGameStates eventGameEnd;
-    public DelegatedGameStates eventTypingGameStart;
-    public DelegatedGameStates eventTypingGameReset;
-    public DelegatedGameStates eventTypingGameEnd;
+    public DelegatedGameStates eventHackingMiniGameStart;
+    public DelegatedGameStates eventHackingMiniGameReset;
+    public DelegatedGameStates eventHackingMiniGameEnd;
     public static GameManager instance;
+
+    [SerializeField] private CombatData combatData;
+    private PlayerSaveData currentData;
 
     private Timer timer;
     [SerializeField] float initiateTime;
@@ -29,6 +32,37 @@ public class GameManager : MonoBehaviour
         GamePrepate();
     }
 
+
+    void Start()
+    {
+        LoadGame();
+    }
+
+    public void SaveGame()
+    {
+        string json = JsonUtility.ToJson(currentData, true);
+        PlayerPrefs.SetString("SaveData", json);
+    }
+
+    public void LoadGame()
+    {
+        if (PlayerPrefs.HasKey("SaveData"))
+        {
+            string json = PlayerPrefs.GetString("SaveData");
+            currentData = JsonUtility.FromJson<PlayerSaveData>(json);
+            combatData.LoadFromData(currentData); // Esta sí existe si la agregaste arriba
+        }
+        else
+        {
+            currentData = new PlayerSaveData(); // Nuevo juego
+        }
+    }
+
+    public void OnClick_SaveButton()
+    {
+        SaveGame();
+    }
+
     public void GamePrepate()
     {
         timer = FindAnyObjectByType<Timer>();
@@ -38,7 +72,7 @@ public class GameManager : MonoBehaviour
     public void GameStart()
     {
         eventGameStart?.Invoke();
-        TypingGameStart();
+        HackingMiniGameStart();
     }
 
     public void GamePause()
@@ -50,22 +84,22 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void TypingGameStart()
+    public void HackingMiniGameStart()
     {
         Debug.Log("initiateTime: " + initiateTime);
-        timer.eventEndTime += ResetTypingGame;
+        timer.eventEndTime += ResetHackingMiniGame;
         timer.Initiate(initiateTime);
-        eventTypingGameStart?.Invoke();
+        eventHackingMiniGameStart?.Invoke();
     }
 
-    public void ResetTypingGame()
+    public void ResetHackingMiniGame()
     {
-        eventTypingGameReset?.Invoke();
+        eventHackingMiniGameReset?.Invoke();
     }
 
-    public void TypingGameEnd()
+    public void HackingMiniGameEnd()
     {
-        eventTypingGameEnd?.Invoke();
+        eventHackingMiniGameEnd?.Invoke();
     }
 
     public void GameEnd()

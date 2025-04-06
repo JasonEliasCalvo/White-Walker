@@ -167,7 +167,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &232615305
 RectTransform:
   m_ObjectHideFlags: 0
@@ -410,7 +410,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1756258331717772756, guid: 1c732381f18d5044380bd8c923718853, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6394223169942622001, guid: 1c732381f18d5044380bd8c923718853, type: 3}
       propertyPath: m_IsActive
@@ -1026,14 +1026,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   datosCombate: {fileID: 1984542547}
-  "ComboPu\xF1osPatadasBoton1Normal": 000000000100000002000000
-  "ComboPu\xF1osPatadasBoton2Normal": 03000000
-  "ComboPu\xF1osPatadasBoton1SiEstaDerribado": 04000000
-  "ComboPu\xF1osPatadasBoton2SiEstaDerribado": 05000000
-  ComboDagaNormal: 000000000100000002000000
-  ComboDagaNormalSiEstaDerribado: 03000000
-  ComboDagaEspecial: 00000000
-  ComboDagaEspecialSiEstaDerribado: 01000000
+  "ComboPu\xF1osPatadasBoton1Normal": []
+  "ComboPu\xF1osPatadasBoton2Normal": []
+  "ComboPu\xF1osPatadasBoton1SiEstaDerribado": []
+  "ComboPu\xF1osPatadasBoton2SiEstaDerribado": []
+  ComboDagaNormal: []
+  ComboDagaNormalSiEstaDerribado: []
 --- !u!4 &698719697
 Transform:
   m_ObjectHideFlags: 0
@@ -1743,25 +1741,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 29ff8af55492809468d525b8e442b28e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  "ataquesPu\xF1osPatadas":
-  - {fileID: 11400000, guid: bb8e06e8666997749b72d9b980f9bbbb, type: 2}
-  - {fileID: 11400000, guid: 62882bdb8d33def4688a247749ea124a, type: 2}
-  - {fileID: 11400000, guid: af6d9482b9ca420498407b6387608b39, type: 2}
-  - {fileID: 11400000, guid: d35de330c31476c4da8b067a39a764f4, type: 2}
-  - {fileID: 11400000, guid: cb4b01800cb9be34da31138094f124cc, type: 2}
-  - {fileID: 11400000, guid: 76bc23253e6bc9a4e935be3a18af933a, type: 2}
-  ataquesDaga:
-  - {fileID: 11400000, guid: ffeee623009eb91488e128e1746188e4, type: 2}
-  - {fileID: 11400000, guid: dd4ff6cb5716bb24d9d04d49ae993f3e, type: 2}
-  - {fileID: 11400000, guid: f61463287ab2ece428b75ebd72984166, type: 2}
-  - {fileID: 11400000, guid: ff1948eac53b0584db0bd0fb53d83731, type: 2}
-  ataquesDagaEspeciales:
-  - {fileID: 11400000, guid: 176511e78fcfef84ea55150762540f86, type: 2}
-  - {fileID: 11400000, guid: 27e22adcafb6e9c4ea5240eb2d682c65, type: 2}
-  disparosPistola:
-  - {fileID: 11400000, guid: aef709001c7bd1a4bb689c9edf4684a9, type: 2}
-  remate: []
-  provocaciones: []
+  database: {fileID: 0}
 --- !u!1 &2099088145 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1756258331717772756, guid: 1c732381f18d5044380bd8c923718853, type: 3}

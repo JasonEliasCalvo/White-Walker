@@ -17,9 +17,6 @@ public class ComboManager : MonoBehaviour
     public List<DaggerAttack> ComboDagaNormal;
     public List<DaggerAttack> ComboDagaNormalSiEstaDerribado;
 
-    public List<SpecialDaggerAttack> ComboDagaEspecial;
-    public List<SpecialDaggerAttack> ComboDagaEspecialSiEstaDerribado;
-
     private int comboContador = 0;
     private float tiempoUltimoGolpe;
     public const float tiempoMaxCombo = 1.5f;
@@ -50,9 +47,9 @@ public class ComboManager : MonoBehaviour
         combos[(ArmaEquipada.PuñosPatadas, 2, true)] = ComboPuñosPatadasBoton2SiEstaDerribado;
 
         combos[(ArmaEquipada.Daga, 1, false)] = ComboDagaNormal;
-        combos[(ArmaEquipada.Daga, 2, false)] = ComboDagaEspecial;
+        //combos[(ArmaEquipada.Daga, 2, false)] = ;
         combos[(ArmaEquipada.Daga, 1, true)] = ComboDagaNormalSiEstaDerribado;
-        combos[(ArmaEquipada.Daga, 2, true)] = ComboDagaEspecialSiEstaDerribado;
+        //combos[(ArmaEquipada.Daga, 2, true)] = ;
     }
 
     private void CambiarArma(ArmaEquipada nuevaArma)
@@ -101,10 +98,6 @@ public class ComboManager : MonoBehaviour
             case DaggerAttack ataqueDaga:
                 EjecutarAtaque(ataqueDaga);
                 break;
-
-            case SpecialDaggerAttack dagaEspecial:
-                EjecutarAtaque(dagaEspecial);
-                break;
         }
     }
 
@@ -124,12 +117,6 @@ public class ComboManager : MonoBehaviour
     {
         if (ataque == null) return;
         Debug.Log($"Ejecutando: {ataque.attackName}, Daño: {ataque.damage}");
-    }
-
-    public void EjecutarAtaque(SpecialDaggerAttack ataque)
-    {
-        if (ataque == null) return;
-        Debug.Log($"Ejecutando Daga Especial: {ataque.attackName}, Daño: {ataque.damage}");
     }
 
     private bool PuedeSerDerribado() => Random.value > 0.5f;

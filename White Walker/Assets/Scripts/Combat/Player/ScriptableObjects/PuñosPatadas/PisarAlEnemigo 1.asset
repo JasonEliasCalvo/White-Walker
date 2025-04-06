@@ -9,14 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce0d0d8ee56e34a42a05487e107e8bca, type: 3}
-  m_Name: DisparoPistola
+  m_Script: {fileID: 11500000, guid: ce74c835ae8d1fe4aa06230be3561a67, type: 3}
+  m_Name: PisarAlEnemigo 1
   m_EditorClassIdentifier: 
-  categoria: 8
-  Nombre: Disparo Rapido
-  AnimacionAtacante: 
-  AnimacionDefensor: 
-  Prioridad: 0
-  Rango: 0
-  "Da\xF1o": 0
-  tipo: 0
+  id: 0
+  attackName: 
+  attackerAnimation: 
+  defenderAnimation: 
+  damage: 0
+  speed: 0
+  angle: 0
+  effects: []

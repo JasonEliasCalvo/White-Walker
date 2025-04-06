@@ -1,17 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum EffectTag
+public enum AttackCategory
 {
-    None,
-    LowAttack,
-    BreakGuard,
-    AirLauncher,
-    Knockdown,
-    HighDodge,
-    Cancelable,
-    HeavyHit,
-    Stun,
+    FistKick,
+    Dagger,
+    Gun,
+    Finisher
 }
 
 public abstract class AttackBase : ScriptableObject
@@ -26,5 +21,5 @@ public abstract class AttackBase : ScriptableObject
     public float angle;
 
     [Header("Effects")]
-    public List<EffectTag> effects;
+    public List<EffectData> effects;
 }

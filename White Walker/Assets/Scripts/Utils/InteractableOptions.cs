@@ -6,15 +6,14 @@ using UnityEngine.Events;
 
 public enum InteractionType
 {
-    GenerateCards,
     StartDialogue,
     StartMoving,
-    StartTypingGame
+    StopMoving,
+    StartHackingMiniGame
 }
 
 public class InteractableOptions : MonoBehaviour
 {
-    private DialogueSystem dialogueSystem;
     
     [SerializeField] private InteractionType interactionType;
     [SerializeField] private int ID;
@@ -46,18 +45,14 @@ public class InteractableOptions : MonoBehaviour
     {
         switch (interactionType)
         {
-            case InteractionType.GenerateCards:
-                break;
-
             case InteractionType.StartDialogue:
-                dialogueSystem?.StartDialogue(ID);
                 break;
             
             case InteractionType.StartMoving:
                 break;
 
-            case InteractionType.StartTypingGame:
-                GameManager.instance.TypingGameStart();
+            case InteractionType.StartHackingMiniGame:
+                GameManager.instance.HackingMiniGameStart();
                     break;
         }
     }

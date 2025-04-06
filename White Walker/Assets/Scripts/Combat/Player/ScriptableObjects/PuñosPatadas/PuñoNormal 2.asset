@@ -9,16 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 882e15dec1b03c049a4354eb35088c7a, type: 3}
-  m_Name: PatadaBaja
+  m_Script: {fileID: 11500000, guid: ce74c835ae8d1fe4aa06230be3561a67, type: 3}
+  m_Name: "Pu\xF1oNormal 2"
   m_EditorClassIdentifier: 
-  categoria: 1
-  nombre: PatadaBaja
-  animacionAtacante: 
-  animacionDefensor: 
-  rango: 5
-  "da\xF1o": 5
-  derriba: 1
-  requiereEnemigoEnElAire: 0
-  requiereEnemigoEnElSuelo: 0
-  tipo: 3
+  id: 0
+  attackName: 
+  attackerAnimation: 
+  defenderAnimation: 
+  damage: 0
+  speed: 0
+  angle: 0
+  effects: []

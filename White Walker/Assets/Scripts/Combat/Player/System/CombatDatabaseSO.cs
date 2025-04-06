@@ -8,7 +8,6 @@ public class CombatDatabaseSO : ScriptableObject
     public List<AttackBase> allAttacks;
     public List<FistKickAttack> fistKickAttacks;
     public List<DaggerAttack> daggerAttacks;
-    public List<SpecialDaggerAttack> specialDaggerAttacks;
     public List<GunAttack> gunAttacks;
     public List<Finisher> finishers;
     public List<Taunt> taunts;
@@ -18,7 +17,6 @@ public class CombatDatabaseSO : ScriptableObject
         allAttacks = new();
         allAttacks.AddRange(fistKickAttacks);
         allAttacks.AddRange(daggerAttacks);
-        allAttacks.AddRange(specialDaggerAttacks);
         allAttacks.AddRange(gunAttacks);
         allAttacks.AddRange(finishers);
     }
