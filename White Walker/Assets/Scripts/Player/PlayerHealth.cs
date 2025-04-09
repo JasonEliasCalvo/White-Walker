@@ -23,6 +23,5 @@ public class PlayerHealth : HealthSystem
             Heal(5f);
             Debug.Log($"Jugador curado. Vida actual: {CurrentHealth}");
         }
-        Debug.Log($"actual: {CurrentHealth}");
     }
 }

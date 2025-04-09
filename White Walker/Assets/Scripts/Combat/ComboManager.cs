@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class ComboManager : MonoBehaviour
 {
-    public CombatData datosCombate;
+    //public CombatData datosCombate;
     public enum ArmaEquipada{ PuñosPatadas,Daga }
 
     private readonly Dictionary<(ArmaEquipada, int, bool), IList> combos = new();
 
-    public List<FistKickAttack> ComboPuñosPatadasBoton1Normal;
-    public List<FistKickAttack> ComboPuñosPatadasBoton2Normal;
-    public List<FistKickAttack> ComboPuñosPatadasBoton1SiEstaDerribado;
-    public List<FistKickAttack> ComboPuñosPatadasBoton2SiEstaDerribado;
+    //public List<FistKickAttack> ComboPuñosPatadasBoton1Normal;
+    //public List<FistKickAttack> ComboPuñosPatadasBoton2Normal;
+    //public List<FistKickAttack> ComboPuñosPatadasBoton1SiEstaDerribado;
+    //public List<FistKickAttack> ComboPuñosPatadasBoton2SiEstaDerribado;
 
-    public List<DaggerAttack> ComboDagaNormal;
-    public List<DaggerAttack> ComboDagaNormalSiEstaDerribado;
+    //public List<DaggerAttack> ComboDagaNormal;
+    //public List<DaggerAttack> ComboDagaNormalSiEstaDerribado;
 
     private int comboContador = 0;
     private float tiempoUltimoGolpe;
@@ -41,15 +41,15 @@ public class ComboManager : MonoBehaviour
 
     private void RegistrarCombos()
     {
-        combos[(ArmaEquipada.PuñosPatadas, 1, false)] = ComboPuñosPatadasBoton1Normal;
-        combos[(ArmaEquipada.PuñosPatadas, 2, false)] = ComboPuñosPatadasBoton2Normal;
-        combos[(ArmaEquipada.PuñosPatadas, 1, true)] = ComboPuñosPatadasBoton1SiEstaDerribado;
-        combos[(ArmaEquipada.PuñosPatadas, 2, true)] = ComboPuñosPatadasBoton2SiEstaDerribado;
+        //combos[(ArmaEquipada.PuñosPatadas, 1, false)] = ComboPuñosPatadasBoton1Normal;
+        //combos[(ArmaEquipada.PuñosPatadas, 2, false)] = ComboPuñosPatadasBoton2Normal;
+        //combos[(ArmaEquipada.PuñosPatadas, 1, true)] = ComboPuñosPatadasBoton1SiEstaDerribado;
+        //combos[(ArmaEquipada.PuñosPatadas, 2, true)] = ComboPuñosPatadasBoton2SiEstaDerribado;
 
-        combos[(ArmaEquipada.Daga, 1, false)] = ComboDagaNormal;
-        //combos[(ArmaEquipada.Daga, 2, false)] = ;
-        combos[(ArmaEquipada.Daga, 1, true)] = ComboDagaNormalSiEstaDerribado;
-        //combos[(ArmaEquipada.Daga, 2, true)] = ;
+        //combos[(ArmaEquipada.Daga, 1, false)] = ComboDagaNormal;
+        ////combos[(ArmaEquipada.Daga, 2, false)] = ;
+        //combos[(ArmaEquipada.Daga, 1, true)] = ComboDagaNormalSiEstaDerribado;
+        ////combos[(ArmaEquipada.Daga, 2, true)] = ;
     }
 
     private void CambiarArma(ArmaEquipada nuevaArma)
@@ -75,7 +75,7 @@ public class ComboManager : MonoBehaviour
 
             if (comboContador < comboActual.Count)
             {
-                EjecutarAtaqueGenerico(comboActual, comboContador);
+                //EjecutarAtaqueGenerico(comboActual, comboContador);
                 comboContador++;
             }
 
@@ -83,41 +83,41 @@ public class ComboManager : MonoBehaviour
         }
     }
 
-    private void EjecutarAtaqueGenerico(IList combo, int indice)
-    {
-        if (combo == null || indice >= combo.Count) return;
+    //private void EjecutarAtaqueGenerico(IList combo, int indice)
+    //{
+    //    if (combo == null || indice >= combo.Count) return;
 
-        var tipo = combo[indice];
+    //    var tipo = combo[indice];
 
-        switch (tipo)
-        {
-            case FistKickAttack ataquePuño:
-                EjecutarAtaque(ataquePuño);
-                break;
+    //    switch (tipo)
+    //    {
+    //        case FistKickAttack ataquePuño:
+    //            EjecutarAtaque(ataquePuño);
+    //            break;
 
-            case DaggerAttack ataqueDaga:
-                EjecutarAtaque(ataqueDaga);
-                break;
-        }
-    }
+    //        case DaggerAttack ataqueDaga:
+    //            EjecutarAtaque(ataqueDaga);
+    //            break;
+    //    }
+    //}
 
-    public void EjecutarAtaque(FistKickAttack ataque)
-    {
-        if (ataque == null) return;
+    //public void EjecutarAtaque(FistKickAttack ataque)
+    //{
+    //    if (ataque == null) return;
 
-        Debug.Log($"Ejecutando: {ataque.attackName}, Daño: {ataque.damage}");
-        //if (ataque.knockdown && PuedeSerDerribado())
-        //{
-        //    enemigoEnElSuelo = true;
-        //    Debug.Log("Enemigo derribado");
-        //}
-    }
+    //    Debug.Log($"Ejecutando: {ataque.attackName}, Daño: {ataque.damage}");
+    //    //if (ataque.knockdown && PuedeSerDerribado())
+    //    //{
+    //    //    enemigoEnElSuelo = true;
+    //    //    Debug.Log("Enemigo derribado");
+    //    //}
+    //}
 
-    public void EjecutarAtaque(DaggerAttack ataque)
-    {
-        if (ataque == null) return;
-        Debug.Log($"Ejecutando: {ataque.attackName}, Daño: {ataque.damage}");
-    }
+    //public void EjecutarAtaque(DaggerAttack ataque)
+    //{
+    //    if (ataque == null) return;
+    //    Debug.Log($"Ejecutando: {ataque.attackName}, Daño: {ataque.damage}");
+    //}
 
     private bool PuedeSerDerribado() => Random.value > 0.5f;
 

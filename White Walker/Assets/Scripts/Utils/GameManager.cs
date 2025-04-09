@@ -4,84 +4,67 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public static GameManager instance;
+
+    private Timer timer;
+
+    [Header("Minijuego")]
+    [SerializeField] float initiateTime;
+
     public delegate void DelegatedGameStates();
     public DelegatedGameStates eventGameStart;
     public DelegatedGameStates eventGameEnd;
     public DelegatedGameStates eventHackingMiniGameStart;
     public DelegatedGameStates eventHackingMiniGameReset;
     public DelegatedGameStates eventHackingMiniGameEnd;
-    public static GameManager instance;
-
-    [SerializeField] private CombatData combatData;
-    private PlayerSaveData currentData;
-
-    private Timer timer;
-    [SerializeField] float initiateTime;
 
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (instance == null) instance = this;
+        else Destroy(gameObject);
 
-        GamePrepate();
+        GamePrepare();
     }
 
-
-    void Start()
+    private void Start()
     {
-        LoadGame();
+        GamePrepare();
     }
 
-    public void SaveGame()
-    {
-        string json = JsonUtility.ToJson(currentData, true);
-        PlayerPrefs.SetString("SaveData", json);
-    }
-
-    public void LoadGame()
-    {
-        if (PlayerPrefs.HasKey("SaveData"))
-        {
-            string json = PlayerPrefs.GetString("SaveData");
-            currentData = JsonUtility.FromJson<PlayerSaveData>(json);
-            combatData.LoadFromData(currentData); // Esta sí existe si la agregaste arriba
-        }
-        else
-        {
-            currentData = new PlayerSaveData(); // Nuevo juego
-        }
-    }
-
-    public void OnClick_SaveButton()
-    {
-        SaveGame();
-    }
-
-    public void GamePrepate()
+    private void GamePrepare()
     {
         timer = FindAnyObjectByType<Timer>();
         Invoke(nameof(GameStart), 0.2f);
     }
 
-    public void GameStart()
+    public void SaveGame() => PlayerSaveManager.Instance.SaveGame();
+
+    public void LoadGame() => PlayerSaveManager.Instance.LoadGame();
+
+    public void GameStart() => eventGameStart?.Invoke();
+    public void GamePause() { }
+    public void GameResume() { }
+
+    public void GameEnd() => eventGameEnd?.Invoke();
+
+    public void OnClick_SaveButton() => SaveGame();
+
+    public void OnAttackPurchased(int id, WeaponType category)
     {
-        eventGameStart?.Invoke();
-        HackingMiniGameStart();
+        PlayerSaveManager.Instance.UnlockAttack(id, category);
+        PlayerSaveManager.Instance.SaveGame();
     }
 
-    public void GamePause()
-    {
 
-    }
-    public void GameResume()
+    public void EquipCombo(WeaponType category, List<int> attackIDs)
     {
+        var save = PlayerSaveManager.Instance.CurrentSave;
 
+        if (!save.comboData.equippedCombos.ContainsKey(category))
+            save.comboData.equippedCombos[category] = new List<int>();
+
+        save.comboData.equippedCombos[category] = new List<int>(attackIDs);
+        SaveGame();
     }
 
     public void HackingMiniGameStart()
@@ -92,23 +75,7 @@ public class GameManager : MonoBehaviour
         eventHackingMiniGameStart?.Invoke();
     }
 
-    public void ResetHackingMiniGame()
-    {
-        eventHackingMiniGameReset?.Invoke();
-    }
-
-    public void HackingMiniGameEnd()
-    {
-        eventHackingMiniGameEnd?.Invoke();
-    }
-
-    public void GameEnd()
-    {
-        eventGameEnd?.Invoke();
-    }
-
-    public Timer GetTimer()
-    {
-        return timer;
-    }
+    public void ResetHackingMiniGame() => eventHackingMiniGameReset?.Invoke();
+    public void HackingMiniGameEnd() => eventHackingMiniGameEnd?.Invoke();
+    public Timer GetTimer() => timer;
 }

@@ -1,7 +1,7 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "Remate", menuName = "Ataques/Nuevo Remate")]
+[CreateAssetMenu(fileName = "New Finisher", menuName = "Soma/Finisher")]
 public class Finisher : AttackBase
 {
-    public bool Aturdido;
+   
 }
