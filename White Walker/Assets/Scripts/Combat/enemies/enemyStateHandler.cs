@@ -6,6 +6,7 @@ public enum EnemyState
     Stunned,
     Downed
 }
+
 public class enemyStateHandler : MonoBehaviour
 {
     public bool IsStunned { get; private set; }

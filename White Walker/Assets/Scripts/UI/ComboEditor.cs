@@ -21,6 +21,11 @@ public class ComboEditor : MonoBehaviour
     [Header("Datos")]
     public PlayerInventory playerInventory;
 
+    [Header("Combos por defecto (IDs)")]
+    public List<int> defaultClawCombo = new();
+    public List<int> defaultSwordCombo = new();
+    public List<int> defaultGunCombo = new();
+
     private Dictionary<WeaponType, List<AttackBase>> ownedAttacksByType;
 
     private void Start()
@@ -36,9 +41,28 @@ public class ComboEditor : MonoBehaviour
 
         foreach (WeaponType type in System.Enum.GetValues(typeof(WeaponType)))
         {
-            ownedAttacksByType[type] = playerInventory.ownedAttacks
+            ownedAttacksByType[type] = GetOwnedAttacksByType(type);
+        }
+    }
+
+    List<AttackBase> GetOwnedAttacksByType(WeaponType type)
+    {
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+        {
+            return playerInventory.ownedAttacks
                 .Where(a => a.category == type)
                 .ToList();
+        }
+        else // JSON
+        {
+            var save = PlayerSaveManager.Instance.CurrentSave;
+            if (save.unlockData.unlockedAttacks.TryGetValue(type, out var ids))
+            {
+                return CombatManager.Instance.GetAttacksByCategory(type)
+                    .Where(a => ids.Contains(a.attackID))
+                    .ToList();
+            }
+            return new List<AttackBase>();
         }
     }
 
@@ -95,14 +119,35 @@ public class ComboEditor : MonoBehaviour
 
     public void SaveCombo()
     {
-        var save = PlayerSaveManager.Instance.CurrentSave.comboData;
+        var clawIDs = GetIDsFromDropdowns(claw1, claw2, claw3);
+        var swordIDs = GetIDsFromDropdowns(sword1, sword2, sword3);
+        var gunIDs = GetIDsFromDropdowns(gun);
 
-        save.equippedCombos[WeaponType.Claw] = GetIDsFromDropdowns(claw1, claw2, claw3);
-        save.equippedCombos[WeaponType.Sword] = GetIDsFromDropdowns(sword1, sword2, sword3);
-        save.equippedCombos[WeaponType.Gun] = GetIDsFromDropdowns(gun);
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Json)
+        {
+            var save = PlayerSaveManager.Instance.CurrentSave.comboData;
 
-        PlayerSaveManager.Instance.SaveGame();
-        Debug.Log("Combos guardados");
+            // Eliminamos entradas anteriores
+            save.equippedCombos.RemoveAll(c => c.weaponType == WeaponType.Claw || c.weaponType == WeaponType.Sword || c.weaponType == WeaponType.Gun);
+
+            // Guardamos los combos nuevos
+            save.equippedCombos.Add(new ComboSet { weaponType = WeaponType.Claw, attackIDs = clawIDs });
+            save.equippedCombos.Add(new ComboSet { weaponType = WeaponType.Sword, attackIDs = swordIDs });
+            save.equippedCombos.Add(new ComboSet { weaponType = WeaponType.Gun, attackIDs = gunIDs });
+
+            PlayerSaveManager.Instance.SaveGame();
+            Debug.Log("Combos guardados en JSON");
+        }
+        else // ScriptableObject
+        {
+            playerInventory.comboClaw = clawIDs;
+            playerInventory.comboSword = swordIDs;
+            playerInventory.comboGun = gunIDs;
+
+            Debug.Log("Combos guardados en ScriptableObject");
+        }
+
+        ComboEvents.OnComboChanged?.Invoke();
     }
 
     List<int> GetIDsFromDropdowns(params TMP_Dropdown[] dropdowns)
@@ -124,17 +169,38 @@ public class ComboEditor : MonoBehaviour
 
     void LoadSavedCombos()
     {
-        foreach (WeaponType type in ownedAttacksByType.Keys)
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Json)
         {
-            if (!PlayerSaveManager.Instance.CurrentSave.comboData.equippedCombos.TryGetValue(type, out var saved)) continue;
-
-            var dropdowns = GetDropdownsByWeapon(type);
-            for (int i = 0; i < dropdowns.Length && i < saved.Count; i++)
+            var comboData = PlayerSaveManager.Instance.CurrentSave.comboData;
+            foreach (var comboSet in comboData.equippedCombos)
             {
-                int id = saved[i];
-                var index = ownedAttacksByType[type].FindIndex(a => a.attackID == id);
-                dropdowns[i].value = index >= 0 ? index + 1 : 0; // +1 porque "(Ninguno)" está en el index 0
+                var type = comboSet.weaponType;
+                if (!ownedAttacksByType.ContainsKey(type)) continue;
+
+                var dropdowns = GetDropdownsByWeapon(type);
+                for (int i = 0; i < dropdowns.Length && i < comboSet.attackIDs.Count; i++)
+                {
+                    int id = comboSet.attackIDs[i];
+                    int index = ownedAttacksByType[type].FindIndex(a => a.attackID == id);
+                    dropdowns[i].value = index >= 0 ? index + 1 : 0;
+                }
             }
+        }
+        else
+        {
+            ApplySavedCombo(WeaponType.Claw, playerInventory.comboClaw, new[] { claw1, claw2, claw3 });
+            ApplySavedCombo(WeaponType.Sword, playerInventory.comboSword, new[] { sword1, sword2, sword3 });
+            ApplySavedCombo(WeaponType.Gun, playerInventory.comboGun, new[] { gun });
+        }
+    }
+
+    void ApplySavedCombo(WeaponType type, List<int> ids, TMP_Dropdown[] dropdowns)
+    {
+        for (int i = 0; i < dropdowns.Length && i < ids.Count; i++)
+        {
+            int id = ids[i];
+            var index = ownedAttacksByType[type].FindIndex(a => a.attackID == id);
+            dropdowns[i].value = index >= 0 ? index + 1 : 0;
         }
     }
 
@@ -147,5 +213,16 @@ public class ComboEditor : MonoBehaviour
             WeaponType.Gun => new[] { gun },
             _ => new TMP_Dropdown[0]
         };
+    }
+
+    public void ResetToDefaultCombos()
+    {
+        Debug.Log("Reseteando combos a los valores por defecto...");
+
+        ApplySavedCombo(WeaponType.Claw, defaultClawCombo, GetDropdownsByWeapon(WeaponType.Claw));
+        ApplySavedCombo(WeaponType.Sword, defaultSwordCombo, GetDropdownsByWeapon(WeaponType.Sword));
+        ApplySavedCombo(WeaponType.Gun, defaultGunCombo, GetDropdownsByWeapon(WeaponType.Gun));
+
+        SaveCombo(); // También los guarda
     }
 }

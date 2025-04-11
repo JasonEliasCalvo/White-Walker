@@ -12,6 +12,11 @@ public class PlayerInventory : ScriptableObject
     [Tooltip("Ataques que el jugador ya compró")]
     public List<AttackBase> ownedAttacks = new();
 
+    [Header("Combos Equipados")]
+    public List<int> comboClaw = new();
+    public List<int> comboSword = new();
+    public List<int> comboGun = new();
+
     public bool IsUnlocked(AttackBase attack) => unlockedAttacks.Contains(attack);
     public bool IsOwned(AttackBase attack) => ownedAttacks.Contains(attack);
 

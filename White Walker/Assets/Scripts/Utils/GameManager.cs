@@ -26,11 +26,6 @@ public class GameManager : MonoBehaviour
         GamePrepare();
     }
 
-    private void Start()
-    {
-        GamePrepare();
-    }
-
     private void GamePrepare()
     {
         timer = FindAnyObjectByType<Timer>();
@@ -53,18 +48,6 @@ public class GameManager : MonoBehaviour
     {
         PlayerSaveManager.Instance.UnlockAttack(id, category);
         PlayerSaveManager.Instance.SaveGame();
-    }
-
-
-    public void EquipCombo(WeaponType category, List<int> attackIDs)
-    {
-        var save = PlayerSaveManager.Instance.CurrentSave;
-
-        if (!save.comboData.equippedCombos.ContainsKey(category))
-            save.comboData.equippedCombos[category] = new List<int>();
-
-        save.comboData.equippedCombos[category] = new List<int>(attackIDs);
-        SaveGame();
     }
 
     public void HackingMiniGameStart()

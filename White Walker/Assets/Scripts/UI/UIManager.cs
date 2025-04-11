@@ -9,15 +9,10 @@ public class UIManager : MonoBehaviour
     [Header("UI Dialogue Elements")]
     [SerializeField] private GameObject interactablePanel;
     [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private GameObject choicesPanel;
+    [SerializeField] private GameObject HakingPanel;
+    [SerializeField] private GameObject ShopPanel;
+    [SerializeField] private GameObject ComboEditorPanel;
     [SerializeField] private TextMeshProUGUI dialogueText;
-    [SerializeField] private TextMeshProUGUI choicesText;
-    [SerializeField] private Transform choicesContainer;
-    [SerializeField] private GameObject choiceButtonPrefab;
-
-    [Header("UI Game Elements")]
-    [SerializeField] private GameObject typingPanel;
-    [SerializeField] private GameObject timerPanel;
 
     [Header("UI Settings")]
     public KeyCode dialogueKey = KeyCode.F;
@@ -32,8 +27,15 @@ public class UIManager : MonoBehaviour
 
     public void Start()
     {
-        instance.ShowDialoguePanel(false);
-        instance.ShowChoicesPanel(false);
+        //ShowDialoguePanel(false);
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyUp(dialogueKey))
+        {
+            ShowComboEditorPanel(true);
+        }
     }
 
     public void ShowInteractablePanel(bool state)
@@ -53,42 +55,17 @@ public class UIManager : MonoBehaviour
         dialoguePanel.SetActive(state);
     }
 
-    public void ShowChoicesPanel(bool state)
+    public void ShowComboEditorPanel(bool state)
     {
-        choicesPanel.SetActive(state);
-    }
-
-    public void ShowTimerPanel(bool state)
-    {
-        timerPanel.SetActive(state);
-    }
-
-    public GameObject GetChoiceButtonPrefab()
-    {
-        return choiceButtonPrefab;
-    }
-
-    public Transform GetChoiceContainer()
-    {
-        return choicesContainer;
-    }
-
-    public void ShowTypingPanel(bool state)
-    {
-        typingPanel.SetActive(state);
+        ComboEditorPanel.SetActive(state);
     }
 
     public bool IsDialogueActive()
     {
-        return dialoguePanel.activeSelf || choicesPanel.activeSelf;
+        return dialoguePanel.activeSelf || HakingPanel.activeSelf;
     }
     public TextMeshProUGUI GetDialogueText()
     {
         return dialogueText;
-    }
-
-    public TextMeshProUGUI GetQuestionText()
-    {
-        return choicesText;
     }
 }

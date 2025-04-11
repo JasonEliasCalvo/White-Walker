@@ -28,11 +28,15 @@ public class ShopManager : MonoBehaviour
         swordButton.onClick.AddListener(() => ChangeCategory(WeaponType.Sword));
         gunButton.onClick.AddListener(() => ChangeCategory(WeaponType.Gun));
 
-        playerInventory.eventAttackUnlocked += OnInventoryUpdated;
-        playerInventory.eventAttackPurchased += OnInventoryUpdated;
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+        {
+            playerInventory.eventAttackUnlocked += OnInventoryUpdated;
+            playerInventory.eventAttackPurchased += OnInventoryUpdated;
+        }
 
         PopulateShop();
     }
+
 
     private void ChangeCategory(WeaponType newCategory)
     {
@@ -54,13 +58,14 @@ public class ShopManager : MonoBehaviour
 
         foreach (var attack in attacks)
         {
-            GameObject btnGO = Instantiate(attackButtonPrefab, attackListContainer);
-            AttackButtonUI buttonUI = btnGO.GetComponent<AttackButtonUI>();
+            GameObject buttonTemp = Instantiate(attackButtonPrefab, attackListContainer);
+            AttackButtonUI buttonUI = buttonTemp.GetComponent<AttackButtonUI>();
 
             bool unlocked = playerInventory.IsUnlocked(attack);
             bool owned = playerInventory.IsOwned(attack);
 
-            buttonUI.Setup(attack, unlocked, owned, a => detailPanel.ShowAttack(a, unlocked, owned, this));
+            buttonUI.Setup(attack, unlocked, owned, a =>
+            detailPanel.ShowAttack(a, unlocked, owned, this));
         }
 
         detailPanel.HidePanel();
@@ -68,16 +73,26 @@ public class ShopManager : MonoBehaviour
 
     public void TryBuyAttack(AttackBase attack)
     {
-        if (!playerInventory.IsUnlocked(attack)) return;
+        if (!IsUnlocked(attack)) return;
 
-        if (playerInventory.gold < attack.cost)
+        if (GetGold() < attack.cost)
         {
             Debug.Log("No tienes suficiente oro.");
             return;
         }
 
-        playerInventory.gold -= attack.cost;
-        playerInventory.Purchase(attack);
+        SpendGold(attack.cost);
+
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+        {
+            playerInventory.Purchase(attack);
+        }
+        else
+        {
+            PlayerSaveManager.Instance.UnlockAttack(attack.attackID, attack.category);
+            PlayerSaveManager.Instance.PurchaseAttack(attack.attackID, attack.category);
+            PlayerSaveManager.Instance.SaveGame();
+        }
 
         ShowEquipConfirmation(attack);
     }
@@ -101,5 +116,39 @@ public class ShopManager : MonoBehaviour
         {
             equipConfirmPanel.SetActive(false);
         });
+    }
+
+    bool IsUnlocked(AttackBase attack)
+    {
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+            return playerInventory.IsUnlocked(attack);
+
+        var save = PlayerSaveManager.Instance.CurrentSave;
+        return save.unlockData.unlockedAttacks.TryGetValue(attack.category, out var list)
+               && list.Contains(attack.attackID);
+    }
+
+    bool IsOwned(AttackBase attack)
+    {
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+            return playerInventory.IsOwned(attack);
+
+        return PlayerSaveManager.Instance.IsAttackOwned(attack.attackID, attack.category);
+    }
+
+    int GetGold()
+    {
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+            return playerInventory.gold;
+
+        return PlayerSaveManager.Instance.CurrentSave.playerStats.money;
+    }
+
+    void SpendGold(int amount)
+    {
+        if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
+            playerInventory.gold -= amount;
+        else
+            PlayerSaveManager.Instance.CurrentSave.playerStats.money -= amount;
     }
 }

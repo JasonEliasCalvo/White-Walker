@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 4842462283718226811}
   - component: {fileID: 8146701531591820245}
   - component: {fileID: 4167582783089872855}
-  - component: {fileID: 6032758997696820783}
   - component: {fileID: 338334011840137179}
+  - component: {fileID: 5244815391135045783}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -111,26 +111,6 @@ MonoBehaviour:
   dashDuration: 0.2
   dashCooldown: 0.5
   rotationSpeed: 10
---- !u!114 &6032758997696820783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1756258331717772756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f26e9240bd459a642a67d76194164a98, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackDamage: 25
-  stunDuration: 2
-  downDuration: 3
-  attackPoint: {fileID: 6440425002400169026}
-  attackRadius: 1
-  layerMaskDetec:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!114 &338334011840137179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -144,6 +124,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+--- !u!114 &5244815391135045783
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756258331717772756}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f423b8f0b3da79409ee1b0372b238a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWeapon: 0
+  attackPoint: {fileID: 6440425002400169026}
+  attackRadius: 1
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  maxComboDelay: 1.2
 --- !u!1 &2978726586070706375
 GameObject:
   m_ObjectHideFlags: 0
@@ -154,7 +153,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6440425002400169026}
   m_Layer: 0
-  m_Name: Pivot
+  m_Name: Attack Point
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
