@@ -9,7 +9,7 @@ public class UIManager : MonoBehaviour
     [Header("UI Dialogue Elements")]
     [SerializeField] private GameObject interactablePanel;
     [SerializeField] private GameObject dialoguePanel;
-    [SerializeField] private GameObject HakingPanel;
+    [SerializeField] private GameObject HackingPanel;
     [SerializeField] private GameObject ShopPanel;
     [SerializeField] private GameObject ComboEditorPanel;
     [SerializeField] private TextMeshProUGUI dialogueText;
@@ -40,7 +40,7 @@ public class UIManager : MonoBehaviour
 
     public void ShowInteractablePanel(bool state)
     {
-        if (!IsDialogueActive())
+        if (!IsPanelActive())
         {
             interactablePanel.SetActive(state);
         }
@@ -60,10 +60,11 @@ public class UIManager : MonoBehaviour
         ComboEditorPanel.SetActive(state);
     }
 
-    public bool IsDialogueActive()
+    public bool IsPanelActive()
     {
-        return dialoguePanel.activeSelf || HakingPanel.activeSelf;
+        return dialoguePanel.activeSelf || HackingPanel.activeSelf || ShopPanel.activeSelf || ComboEditorPanel.activeSelf;
     }
+
     public TextMeshProUGUI GetDialogueText()
     {
         return dialogueText;

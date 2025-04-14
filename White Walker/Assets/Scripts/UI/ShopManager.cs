@@ -141,7 +141,7 @@ public class ShopManager : MonoBehaviour
         if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
             return playerInventory.gold;
 
-        return PlayerSaveManager.Instance.CurrentSave.playerStats.money;
+        return PlayerSaveManager.Instance.CurrentSave.playerStats.points;
     }
 
     void SpendGold(int amount)
@@ -149,6 +149,6 @@ public class ShopManager : MonoBehaviour
         if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
             playerInventory.gold -= amount;
         else
-            PlayerSaveManager.Instance.CurrentSave.playerStats.money -= amount;
+            PlayerSaveManager.Instance.CurrentSave.playerStats.points -= amount;
     }
 }

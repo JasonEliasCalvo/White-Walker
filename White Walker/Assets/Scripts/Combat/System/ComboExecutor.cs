@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class ComboEvents
@@ -24,6 +25,13 @@ public class ComboExecutor : MonoBehaviour
     private float lastAttackTime;
     private bool isAttacking = false;
 
+    [SerializeField] private float gunCooldown = 0.8f;
+    private float lastGunAttackTime;
+
+    public GameObject ghostPrefab;
+    private Dictionary<WeaponType, int> lastComboIndex = new();
+    private Dictionary<WeaponType, float> lastComboTime = new();
+
     private void Start()
     {
         LoadCurrentCombo();
@@ -34,24 +42,26 @@ public class ComboExecutor : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            TryAttack();
-        }
+        HandleInput();
+    }
 
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            TryGunAttack();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            SwitchWeapon();
-        }
+    void HandleInput()
+    {
+        if (Input.GetMouseButtonDown(0)) TryAttack();
+        if (Input.GetMouseButtonDown(1)) TryGunAttack();
+        if (Input.GetKeyDown(KeyCode.Tab)) SwitchWeapon();
     }
 
     void SwitchWeapon()
     {
+
+        if (isAttacking && currentIndex > 0 && currentIndex <= currentCombo.Count)
+        {
+            var atk = currentCombo[currentIndex - 1];
+            SpawnAttackGhost(atk);
+            SaveComboProgress();
+        }
+
         currentWeapon = currentWeapon switch
         {
             WeaponType.Claw => WeaponType.Sword,
@@ -60,34 +70,69 @@ public class ComboExecutor : MonoBehaviour
         };
 
         LoadCurrentCombo();
-        currentIndex = 0;
         Debug.Log($"[ComboExecutor] Cambiaste a arma: {currentWeapon}");
+    }
+
+    void SpawnAttackGhost(AttackBase atk)
+    {
+        var ghost = Instantiate(ghostPrefab, attackPoint.position, attackPoint.rotation);
+        var ghostScript = ghost.GetComponent<AttackGhost>();
+        ghostScript.Init(atk);
+    }
+
+    void SaveComboProgress()
+    {
+        lastComboIndex[currentWeapon] = currentIndex;
+        lastComboTime[currentWeapon] = Time.time;
+    }
+
+    void ApplyEffects(Collider hit, AttackBase atk)
+    {
+        var enemy = hit.GetComponent<EnemyController>();
+        if (enemy == null) return;
+
+        foreach (var effect in atk.effects)
+        {
+            switch (effect.tag)
+            {
+                case EffectTag.Stun:
+                    enemy.Stun(effect.duration);
+                    break;
+                case EffectTag.Knockdown:
+                    enemy.KnockDown(effect.duration);
+                    break;
+                    // Agrega más efectos aquí si es necesario
+            }
+        }
+    }
+
+    List<AttackBase> GetCombo(WeaponType weaponType)
+    {
+        var ids = GetComboIDs(weaponType);
+        return ids.Select(id => CombatManager.Instance.GetAttackById(id))
+                  .Where(atk => atk != null)
+                  .ToList();
     }
 
     void LoadCurrentCombo()
     {
-        currentCombo.Clear();
-        List<int> comboIDs = GetComboIDs(currentWeapon);
+        currentCombo = GetCombo(currentWeapon);
 
-        foreach (int id in comboIDs)
+        if (lastComboTime.TryGetValue(currentWeapon, out float lastTime) &&
+        Time.time - lastTime < maxComboDelay &&
+        lastComboIndex.TryGetValue(currentWeapon, out int lastIdx))
         {
-            var atk = CombatManager.Instance.GetAttackById(id);
-            if (atk != null)
-                currentCombo.Add(atk);
+            currentIndex = lastIdx;
+        }
+        else
+        {
+            currentIndex = 0;
         }
     }
 
     void LoadGunCombo()
     {
-        gunCombo.Clear();
-        List<int> comboIDs = GetComboIDs(WeaponType.Gun);
-
-        foreach (int id in comboIDs)
-        {
-            var atk = CombatManager.Instance.GetAttackById(id);
-            if (atk != null)
-                gunCombo.Add(atk);
-        }
+        gunCombo = GetCombo(WeaponType.Gun);
     }
 
     private void OnComboChanged()
@@ -138,6 +183,8 @@ public class ComboExecutor : MonoBehaviour
 
     void TryGunAttack()
     {
+        if (Time.time - lastGunAttackTime < gunCooldown) return;
+
         if (gunIndex >= gunCombo.Count) gunIndex = 0;
 
         if (gunCombo.Count == 0) return;
@@ -146,6 +193,8 @@ public class ComboExecutor : MonoBehaviour
         Debug.Log($"[ComboExecutor] Ataque con pistola");
         ExecuteAttack(atk);
         gunIndex++;
+
+        lastGunAttackTime = Time.time;
     }
 
     void ExecuteAttack(AttackBase atk)
@@ -158,23 +207,11 @@ public class ComboExecutor : MonoBehaviour
         foreach (var hit in hits)
         {
             var target = hit.GetComponent<IDamageable>();
+            if (target == null) continue;
 
-            if (target != null)
-            {
-                target.TakeDamage(atk.damage);              
-                Debug.Log("Golpeaste a: " + hit.name);
-
-                EnemyController enemy = hit.GetComponent<EnemyController>();
-                if (enemy != null)
-                {
-                    if (AttackUtils.HasEffect(atk, EffectTag.Stun))
-                        enemy.Stun(AttackUtils.GetEffectDuration(atk, EffectTag.Stun));
-
-                    if (AttackUtils.HasEffect(atk, EffectTag.Knockdown))
-                        enemy.KnockDown(AttackUtils.GetEffectDuration(atk, EffectTag.Knockdown));
-                }
-                break;
-            }
+            target.TakeDamage(atk.damage);
+            ApplyEffects(hit, atk);
+            break;
         }
 
         // reproducir animación: animator.Play(atk.animation.name);

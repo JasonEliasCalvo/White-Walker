@@ -66,54 +66,40 @@ public class ComboEditor : MonoBehaviour
         }
     }
 
+    #region Dropdown Population
     void PopulateDropdowns()
     {
-        SetupDropdown(claw1, WeaponType.Claw, GetUsedAttackIDs(claw2, claw3));
-        SetupDropdown(claw2, WeaponType.Claw, GetUsedAttackIDs(claw1, claw3));
-        SetupDropdown(claw3, WeaponType.Claw, GetUsedAttackIDs(claw1, claw2));
-
-        SetupDropdown(sword1, WeaponType.Sword, GetUsedAttackIDs(sword2, sword3));
-        SetupDropdown(sword2, WeaponType.Sword, GetUsedAttackIDs(sword1, sword3));
-        SetupDropdown(sword3, WeaponType.Sword, GetUsedAttackIDs(sword1, sword2));
-
-        SetupDropdown(gun, WeaponType.Gun, new List<int>());
+        PopulateDropdownsForWeapon(WeaponType.Claw, GetDropdownsByWeapon(WeaponType.Claw));
+        PopulateDropdownsForWeapon(WeaponType.Sword, GetDropdownsByWeapon(WeaponType.Sword));
+        PopulateDropdownsForWeapon(WeaponType.Gun, GetDropdownsByWeapon(WeaponType.Gun));
     }
 
-    void SetupDropdown(TMP_Dropdown dropdown, WeaponType type, List<int> excludeIDs)
+    void PopulateDropdownsForWeapon(WeaponType weaponType, TMP_Dropdown[] dropdowns)
+    {
+        foreach (var dropdown in dropdowns)
+        {
+            SetupDropdown(dropdown, weaponType);
+        }
+    }
+
+
+    void SetupDropdown(TMP_Dropdown dropdown, WeaponType type)
     {
         dropdown.ClearOptions();
-        var attacks = ownedAttacksByType[type]
-            .Where(a => !excludeIDs.Contains(a.attackID))
-            .ToList();
-
-        List<string> options = attacks.Select(a => a.attackName).ToList();
-        options.Insert(0, "(Ninguno)");
-
-        dropdown.AddOptions(options);
-    }
-
-    List<int> GetUsedAttackIDs(params TMP_Dropdown[] others)
-    {
-        List<int> ids = new();
-
-        foreach (var dd in others)
+        if (ownedAttacksByType.TryGetValue(type, out var attacks))
         {
-            int i = dd.value - 1;
-            if (i >= 0)
-            {
-                var list = ownedAttacksByType[GetWeaponTypeFromDropdown(dd)];
-                if (i < list.Count)
-                    ids.Add(list[i].attackID);
-            }
+            List<string> options = attacks.Select(a => a.attackName).ToList();
+            options.Insert(0, "(Ninguno)");
+            dropdown.AddOptions(options);
         }
-
-        return ids;
     }
 
-    WeaponType GetWeaponTypeFromDropdown(TMP_Dropdown dd)
+    #endregion
+
+    WeaponType GetWeaponTypeFromDropdown(TMP_Dropdown dropdown)
     {
-        if (dd == claw1 || dd == claw2 || dd == claw3) return WeaponType.Claw;
-        if (dd == sword1 || dd == sword2 || dd == sword3) return WeaponType.Sword;
+        if (dropdown == claw1 || dropdown == claw2 || dropdown == claw3) return WeaponType.Claw;
+        if (dropdown == sword1 || dropdown == sword2 || dropdown == sword3) return WeaponType.Sword;
         return WeaponType.Gun;
     }
 
@@ -146,7 +132,6 @@ public class ComboEditor : MonoBehaviour
 
             Debug.Log("Combos guardados en ScriptableObject");
         }
-
         ComboEvents.OnComboChanged?.Invoke();
     }
 
@@ -159,9 +144,10 @@ public class ComboEditor : MonoBehaviour
             if (i >= 0)
             {
                 var type = GetWeaponTypeFromDropdown(dd);
-                var list = ownedAttacksByType[type];
-                if (i < list.Count)
+                if (ownedAttacksByType.TryGetValue(type, out var list) && i < list.Count)
+                {
                     ids.Add(list[i].attackID);
+                }
             }
         }
         return ids;
@@ -223,6 +209,6 @@ public class ComboEditor : MonoBehaviour
         ApplySavedCombo(WeaponType.Sword, defaultSwordCombo, GetDropdownsByWeapon(WeaponType.Sword));
         ApplySavedCombo(WeaponType.Gun, defaultGunCombo, GetDropdownsByWeapon(WeaponType.Gun));
 
-        SaveCombo(); // También los guarda
+        SaveCombo();
     }
 }

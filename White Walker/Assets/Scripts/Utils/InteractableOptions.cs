@@ -31,7 +31,7 @@ public class InteractableOptions : MonoBehaviour
         {
             if (Input.GetKeyDown(UIManager.instance.dialogueKey) && isPlayerInTrigger)
             {
-                if (!UIManager.instance.IsDialogueActive())
+                if (!UIManager.instance.IsPanelActive())
                 {
                     ExecuteInteraction();
                     UIManager.instance.ShowInteractablePanel(false);

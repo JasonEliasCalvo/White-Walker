@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    private Timer timer;
+    [SerializeField] private Timer timer;
 
     [Header("Minijuego")]
     [SerializeField] float initiateTime;
@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
 
     private void GamePrepare()
     {
-        timer = FindAnyObjectByType<Timer>();
         Invoke(nameof(GameStart), 0.2f);
     }
 
@@ -43,12 +42,6 @@ public class GameManager : MonoBehaviour
     public void GameEnd() => eventGameEnd?.Invoke();
 
     public void OnClick_SaveButton() => SaveGame();
-
-    public void OnAttackPurchased(int id, WeaponType category)
-    {
-        PlayerSaveManager.Instance.UnlockAttack(id, category);
-        PlayerSaveManager.Instance.SaveGame();
-    }
 
     public void HackingMiniGameStart()
     {

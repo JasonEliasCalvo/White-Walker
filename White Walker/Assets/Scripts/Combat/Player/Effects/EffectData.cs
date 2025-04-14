@@ -9,7 +9,6 @@ public enum EffectTag
     BreakGuard,
     AirLauncher,
     Knockdown,
-    HighDodge,
     Cancelable,
     HeavyHit,
     Stun,
