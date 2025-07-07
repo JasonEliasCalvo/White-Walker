@@ -26,7 +26,7 @@ public class ComboEditor : MonoBehaviour
     public List<int> defaultSwordCombo = new();
     public List<int> defaultGunCombo = new();
 
-    private Dictionary<WeaponType, List<AttackBase>> ownedAttacksByType;
+    private Dictionary<StyleType, List<AttackBase>> ownedAttacksByType;
 
     private void Start()
     {
@@ -39,13 +39,13 @@ public class ComboEditor : MonoBehaviour
     {
         ownedAttacksByType = new();
 
-        foreach (WeaponType type in System.Enum.GetValues(typeof(WeaponType)))
+        foreach (StyleType type in System.Enum.GetValues(typeof(StyleType)))
         {
             ownedAttacksByType[type] = GetOwnedAttacksByType(type);
         }
     }
 
-    List<AttackBase> GetOwnedAttacksByType(WeaponType type)
+    List<AttackBase> GetOwnedAttacksByType(StyleType type)
     {
         if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
         {
@@ -69,12 +69,12 @@ public class ComboEditor : MonoBehaviour
     #region Dropdown Population
     void PopulateDropdowns()
     {
-        PopulateDropdownsForWeapon(WeaponType.Claw, GetDropdownsByWeapon(WeaponType.Claw));
-        PopulateDropdownsForWeapon(WeaponType.Sword, GetDropdownsByWeapon(WeaponType.Sword));
-        PopulateDropdownsForWeapon(WeaponType.Gun, GetDropdownsByWeapon(WeaponType.Gun));
+        PopulateDropdownsForWeapon(StyleType.Unarmed, GetDropdownsByWeapon(StyleType.Unarmed));
+        PopulateDropdownsForWeapon(StyleType.Armed, GetDropdownsByWeapon(StyleType.Armed));
+        PopulateDropdownsForWeapon(StyleType.Gun, GetDropdownsByWeapon(StyleType.Gun));
     }
 
-    void PopulateDropdownsForWeapon(WeaponType weaponType, TMP_Dropdown[] dropdowns)
+    void PopulateDropdownsForWeapon(StyleType weaponType, TMP_Dropdown[] dropdowns)
     {
         foreach (var dropdown in dropdowns)
         {
@@ -83,7 +83,7 @@ public class ComboEditor : MonoBehaviour
     }
 
 
-    void SetupDropdown(TMP_Dropdown dropdown, WeaponType type)
+    void SetupDropdown(TMP_Dropdown dropdown, StyleType type)
     {
         dropdown.ClearOptions();
         if (ownedAttacksByType.TryGetValue(type, out var attacks))
@@ -96,11 +96,11 @@ public class ComboEditor : MonoBehaviour
 
     #endregion
 
-    WeaponType GetWeaponTypeFromDropdown(TMP_Dropdown dropdown)
+    StyleType GetWeaponTypeFromDropdown(TMP_Dropdown dropdown)
     {
-        if (dropdown == claw1 || dropdown == claw2 || dropdown == claw3) return WeaponType.Claw;
-        if (dropdown == sword1 || dropdown == sword2 || dropdown == sword3) return WeaponType.Sword;
-        return WeaponType.Gun;
+        if (dropdown == claw1 || dropdown == claw2 || dropdown == claw3) return StyleType.Unarmed;
+        if (dropdown == sword1 || dropdown == sword2 || dropdown == sword3) return StyleType.Armed;
+        return StyleType.Gun;
     }
 
     public void SaveCombo()
@@ -114,12 +114,12 @@ public class ComboEditor : MonoBehaviour
             var save = PlayerSaveManager.Instance.CurrentSave.comboData;
 
             // Eliminamos entradas anteriores
-            save.equippedCombos.RemoveAll(c => c.weaponType == WeaponType.Claw || c.weaponType == WeaponType.Sword || c.weaponType == WeaponType.Gun);
+            save.equippedCombos.RemoveAll(c => c.weaponType == StyleType.Unarmed || c.weaponType == StyleType.Armed || c.weaponType == StyleType.Gun);
 
             // Guardamos los combos nuevos
-            save.equippedCombos.Add(new ComboSet { weaponType = WeaponType.Claw, attackIDs = clawIDs });
-            save.equippedCombos.Add(new ComboSet { weaponType = WeaponType.Sword, attackIDs = swordIDs });
-            save.equippedCombos.Add(new ComboSet { weaponType = WeaponType.Gun, attackIDs = gunIDs });
+            save.equippedCombos.Add(new ComboSet { weaponType = StyleType.Unarmed, attackIDs = clawIDs });
+            save.equippedCombos.Add(new ComboSet { weaponType = StyleType.Armed, attackIDs = swordIDs });
+            save.equippedCombos.Add(new ComboSet { weaponType = StyleType.Gun, attackIDs = gunIDs });
 
             PlayerSaveManager.Instance.SaveGame();
             Debug.Log("Combos guardados en JSON");
@@ -174,13 +174,13 @@ public class ComboEditor : MonoBehaviour
         }
         else
         {
-            ApplySavedCombo(WeaponType.Claw, playerInventory.comboClaw, new[] { claw1, claw2, claw3 });
-            ApplySavedCombo(WeaponType.Sword, playerInventory.comboSword, new[] { sword1, sword2, sword3 });
-            ApplySavedCombo(WeaponType.Gun, playerInventory.comboGun, new[] { gun });
+            ApplySavedCombo(StyleType.Unarmed, playerInventory.comboClaw, new[] { claw1, claw2, claw3 });
+            ApplySavedCombo(StyleType.Armed, playerInventory.comboSword, new[] { sword1, sword2, sword3 });
+            ApplySavedCombo(StyleType.Gun, playerInventory.comboGun, new[] { gun });
         }
     }
 
-    void ApplySavedCombo(WeaponType type, List<int> ids, TMP_Dropdown[] dropdowns)
+    void ApplySavedCombo(StyleType type, List<int> ids, TMP_Dropdown[] dropdowns)
     {
         for (int i = 0; i < dropdowns.Length && i < ids.Count; i++)
         {
@@ -190,13 +190,13 @@ public class ComboEditor : MonoBehaviour
         }
     }
 
-    TMP_Dropdown[] GetDropdownsByWeapon(WeaponType type)
+    TMP_Dropdown[] GetDropdownsByWeapon(StyleType type)
     {
         return type switch
         {
-            WeaponType.Claw => new[] { claw1, claw2, claw3 },
-            WeaponType.Sword => new[] { sword1, sword2, sword3 },
-            WeaponType.Gun => new[] { gun },
+            StyleType.Unarmed => new[] { claw1, claw2, claw3 },
+            StyleType.Armed => new[] { sword1, sword2, sword3 },
+            StyleType.Gun => new[] { gun },
             _ => new TMP_Dropdown[0]
         };
     }
@@ -205,9 +205,9 @@ public class ComboEditor : MonoBehaviour
     {
         Debug.Log("Reseteando combos a los valores por defecto...");
 
-        ApplySavedCombo(WeaponType.Claw, defaultClawCombo, GetDropdownsByWeapon(WeaponType.Claw));
-        ApplySavedCombo(WeaponType.Sword, defaultSwordCombo, GetDropdownsByWeapon(WeaponType.Sword));
-        ApplySavedCombo(WeaponType.Gun, defaultGunCombo, GetDropdownsByWeapon(WeaponType.Gun));
+        ApplySavedCombo(StyleType.Unarmed, defaultClawCombo, GetDropdownsByWeapon(StyleType.Unarmed));
+        ApplySavedCombo(StyleType.Armed, defaultSwordCombo, GetDropdownsByWeapon(StyleType.Armed));
+        ApplySavedCombo(StyleType.Gun, defaultGunCombo, GetDropdownsByWeapon(StyleType.Gun));
 
         SaveCombo();
     }

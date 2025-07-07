@@ -42,7 +42,7 @@ public class PlayerSaveManager : MonoBehaviour
             CreateFromScriptable();
     }
 
-    private void AddAttackToDictionary(Dictionary<WeaponType, List<int>> dictionary, WeaponType category, int id)
+    private void AddAttackToDictionary(Dictionary<StyleType, List<int>> dictionary, StyleType category, int id)
     {
         // Comprueba si la categoría del arma ya existe como clave en el diccionario.
         if (!dictionary.ContainsKey(category))
@@ -151,7 +151,7 @@ public class PlayerSaveManager : MonoBehaviour
         }
     }
 
-    public void EquipCombo(WeaponType weaponType, List<int> attackIDs)
+    public void EquipCombo(StyleType weaponType, List<int> attackIDs)
     {
         // Comprueba si los datos de guardado o los datos de combo no están inicializados.
         if (CurrentSave == null || CurrentSave.comboData == null)
@@ -179,7 +179,7 @@ public class PlayerSaveManager : MonoBehaviour
         // PlayerSaveManager.Instance.EquipCombo(WeaponType.Claw, new List<int> { 1, 2, 3 });
     }
 
-    public void UnlockAttack(int id, WeaponType category)
+    public void UnlockAttack(int id, StyleType category)
     {
         // Obtiene los datos de desbloqueo del CurrentSave.
         var data = CurrentSave.unlockData;
@@ -188,7 +188,7 @@ public class PlayerSaveManager : MonoBehaviour
         AddAttackToDictionary(data.unlockedAttacks, category, id);
     }
 
-    public void PurchaseAttack(int id, WeaponType category)
+    public void PurchaseAttack(int id, StyleType category)
     {
         // Obtiene los datos de posesión del CurrentSave.
         var data = CurrentSave.ownedData;
@@ -197,7 +197,7 @@ public class PlayerSaveManager : MonoBehaviour
         AddAttackToDictionary(data.ownedAttacks, category, id);
     }
 
-    public bool IsAttackUnlocked(int id, WeaponType category)
+    public bool IsAttackUnlocked(int id, StyleType category)
     {
         // Intenta obtener la lista de ataques desbloqueados para la categoría dada.
         return CurrentSave.unlockData.unlockedAttacks.TryGetValue(category, out var list)
@@ -205,7 +205,7 @@ public class PlayerSaveManager : MonoBehaviour
                && list.Contains(id);
     }
 
-    public bool IsAttackOwned(int id, WeaponType category)
+    public bool IsAttackOwned(int id, StyleType category)
     {
         // Intenta obtener la lista de ataques poseídos para la categoría dada.
         return CurrentSave.ownedData.ownedAttacks.TryGetValue(category, out var list)

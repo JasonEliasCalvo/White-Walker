@@ -6,10 +6,10 @@ public class CombatManager : MonoBehaviour
 {
     public static CombatManager Instance { get; private set; }
 
-    [SerializeField] private CombatDatabaseSO combatDatabase;
+    [SerializeField] private AttackDataSO attackDataSO;
 
     private Dictionary<int, AttackBase> attackById = new();
-    private Dictionary<WeaponType, List<AttackBase>> attacksByCategory = new();
+    private Dictionary<StyleType, List<AttackBase>> attacksByCategory = new();
 
     private void Awake()
     {
@@ -28,7 +28,7 @@ public class CombatManager : MonoBehaviour
         attackById.Clear();
         attacksByCategory.Clear();
 
-        foreach (var attack in combatDatabase.allAttacks)
+        foreach (var attack in attackDataSO.allAttacks)
         {
             if (attackById.ContainsKey(attack.attackID))
             {
@@ -51,7 +51,7 @@ public class CombatManager : MonoBehaviour
         return attack;
     }
 
-    public List<AttackBase> GetAttacksByCategory(WeaponType category)
+    public List<AttackBase> GetAttacksByCategory(StyleType category)
     {
         attacksByCategory.TryGetValue(category, out var list);
         return list;
@@ -62,7 +62,7 @@ public class CombatManager : MonoBehaviour
         return attackById.Values.ToList();
     }
 
-    public List<AttackBase> GetUnlockedAttacks(WeaponType category)
+    public List<AttackBase> GetUnlockedAttacks(StyleType category)
     {
         var ids = PlayerSaveManager.Instance.CurrentSave.unlockData
             .unlockedAttacks.TryGetValue(category, out var list) ? list : new List<int>();

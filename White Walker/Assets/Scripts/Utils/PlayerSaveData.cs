@@ -29,18 +29,18 @@ public class PlayerComboData
 [Serializable]
 public class ComboSet
 {
-    public WeaponType weaponType;
+    public StyleType weaponType;
     public List<int> attackIDs = new();
 }
 [Serializable]
 public class PlayerOwnedData
 {
-    public Dictionary<WeaponType, List<int>> ownedAttacks = new();
+    public Dictionary<StyleType, List<int>> ownedAttacks = new();
 }
 
 public class PlayerUnlockData
 {
-    public Dictionary<WeaponType, List<int>> unlockedAttacks = new();
+    public Dictionary<StyleType, List<int>> unlockedAttacks = new();
 }
 
 [Serializable]

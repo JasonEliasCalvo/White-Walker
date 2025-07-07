@@ -12,7 +12,7 @@ public static class ComboEvents
 public class ComboExecutor : MonoBehaviour
 {
     [Header("Configuración")]
-    public WeaponType currentWeapon;
+    public StyleType currentWeapon;
     public Transform attackPoint;
     public float attackRadius = 1f;
     public LayerMask enemyLayer;
@@ -28,9 +28,10 @@ public class ComboExecutor : MonoBehaviour
     [SerializeField] private float gunCooldown = 0.8f;
     private float lastGunAttackTime;
 
-    public GameObject ghostPrefab;
-    private Dictionary<WeaponType, int> lastComboIndex = new();
-    private Dictionary<WeaponType, float> lastComboTime = new();
+    public GameObject fullBodyGhostPrefab;
+    public GameObject weaponOnlyGhostPrefab;
+    private Dictionary<StyleType, int> lastComboIndex = new();
+    private Dictionary<StyleType, float> lastComboTime = new();
 
     private void Start()
     {
@@ -58,15 +59,18 @@ public class ComboExecutor : MonoBehaviour
         if (isAttacking && currentIndex > 0 && currentIndex <= currentCombo.Count)
         {
             var atk = currentCombo[currentIndex - 1];
-            SpawnAttackGhost(atk);
+            if (atk.spawnGhostOnSwap)
+            {
+                SpawnAttackGhost(atk);
+            }
             SaveComboProgress();
         }
 
         currentWeapon = currentWeapon switch
         {
-            WeaponType.Claw => WeaponType.Sword,
-            WeaponType.Sword => WeaponType.Claw,
-            _ => WeaponType.Claw
+            StyleType.Unarmed => StyleType.Armed,
+            StyleType.Armed => StyleType.Unarmed,
+            _ => StyleType.Unarmed
         };
 
         LoadCurrentCombo();
@@ -75,7 +79,7 @@ public class ComboExecutor : MonoBehaviour
 
     void SpawnAttackGhost(AttackBase atk)
     {
-        var ghost = Instantiate(ghostPrefab, attackPoint.position, attackPoint.rotation);
+        var ghost = Instantiate(weaponOnlyGhostPrefab, attackPoint.position, attackPoint.rotation);
         var ghostScript = ghost.GetComponent<AttackGhost>();
         ghostScript.Init(atk);
     }
@@ -106,7 +110,7 @@ public class ComboExecutor : MonoBehaviour
         }
     }
 
-    List<AttackBase> GetCombo(WeaponType weaponType)
+    List<AttackBase> GetCombo(StyleType weaponType)
     {
         var ids = GetComboIDs(weaponType);
         return ids.Select(id => CombatManager.Instance.GetAttackById(id))
@@ -132,7 +136,7 @@ public class ComboExecutor : MonoBehaviour
 
     void LoadGunCombo()
     {
-        gunCombo = GetCombo(WeaponType.Gun);
+        gunCombo = GetCombo(StyleType.Gun);
     }
 
     private void OnComboChanged()
@@ -144,7 +148,7 @@ public class ComboExecutor : MonoBehaviour
         gunIndex = 0;
     }
 
-    List<int> GetComboIDs(WeaponType weapon)
+    List<int> GetComboIDs(StyleType weapon)
     {
         if (PlayerSaveManager.Instance.currentMode == SaveMode.Json)
         {
@@ -157,13 +161,14 @@ public class ComboExecutor : MonoBehaviour
             var inv = PlayerSaveManager.Instance.inventorySO;
             return weapon switch
             {
-                WeaponType.Claw => inv.comboClaw,
-                WeaponType.Sword => inv.comboSword,
-                WeaponType.Gun => inv.comboGun,
+                StyleType.Unarmed => inv.comboClaw,
+                StyleType.Armed => inv.comboSword,
+                StyleType.Gun => inv.comboGun,
                 _ => new List<int>()
             };
         }
     }
+
 
     void TryAttack()
     {
@@ -173,6 +178,8 @@ public class ComboExecutor : MonoBehaviour
         }
 
         if (currentIndex >= currentCombo.Count) return;
+
+        AssistRotationToEnemy();
 
         AttackBase atk = currentCombo[currentIndex];
         ExecuteAttack(atk);
@@ -191,11 +198,49 @@ public class ComboExecutor : MonoBehaviour
 
         var atk = gunCombo[gunIndex];
         Debug.Log($"[ComboExecutor] Ataque con pistola");
+
+        AssistRotationToEnemy();
+
         ExecuteAttack(atk);
         gunIndex++;
 
         lastGunAttackTime = Time.time;
     }
+
+    void AssistRotationToEnemy(float range = 3f, float maxAngle = 60f, float maxRotationDegrees = 20f)
+    {
+        Collider[] nearby = Physics.OverlapSphere(transform.position, range, enemyLayer);
+
+        Transform bestTarget = null;
+        float bestScore = float.MaxValue;
+
+        foreach (var col in nearby)
+        {
+            Vector3 dirToEnemy = (col.transform.position - transform.position).normalized;
+
+            float angle = Vector3.Angle(transform.forward, dirToEnemy);
+            if (angle > maxAngle) continue; // fuera del cono de visión
+
+            float distance = Vector3.Distance(transform.position, col.transform.position);
+
+            // Calcular una "puntuación" que prioriza ángulo más que distancia
+            float score = angle * 1.5f + distance * 0.5f;
+
+            if (score < bestScore)
+            {
+                bestScore = score;
+                bestTarget = col.transform;
+            }
+        }
+
+        if (bestTarget != null)
+        {
+            Vector3 direction = (bestTarget.position - transform.position).normalized;
+            Quaternion desiredRotation = Quaternion.LookRotation(new Vector3(direction.x, 0, direction.z));
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, desiredRotation, maxRotationDegrees);
+        }
+    }
+
 
     void ExecuteAttack(AttackBase atk)
     {

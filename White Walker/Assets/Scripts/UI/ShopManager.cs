@@ -14,7 +14,7 @@ public class ShopManager : MonoBehaviour
     public GameObject comboEditorPanel;
 
     [Header("Filtros")]
-    public WeaponType currentCategory;
+    public StyleType currentCategory;
     public Button clawButton;
     public Button swordButton;
     public Button gunButton;
@@ -24,9 +24,9 @@ public class ShopManager : MonoBehaviour
 
     private void Start()
     {
-        clawButton.onClick.AddListener(() => ChangeCategory(WeaponType.Claw));
-        swordButton.onClick.AddListener(() => ChangeCategory(WeaponType.Sword));
-        gunButton.onClick.AddListener(() => ChangeCategory(WeaponType.Gun));
+        clawButton.onClick.AddListener(() => ChangeCategory(StyleType.Unarmed));
+        swordButton.onClick.AddListener(() => ChangeCategory(StyleType.Armed));
+        gunButton.onClick.AddListener(() => ChangeCategory(StyleType.Gun));
 
         if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
         {
@@ -38,7 +38,7 @@ public class ShopManager : MonoBehaviour
     }
 
 
-    private void ChangeCategory(WeaponType newCategory)
+    private void ChangeCategory(StyleType newCategory)
     {
         currentCategory = newCategory;
         PopulateShop();

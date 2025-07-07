@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum WeaponType { Claw, Sword, Gun }
+public enum StyleType { Unarmed, Armed, Gun }
 
 public abstract class AttackBase : ScriptableObject
 {
@@ -12,7 +12,10 @@ public abstract class AttackBase : ScriptableObject
     public float damage;              
     public float duration;              
     public int cost;                
-    public WeaponType category;      
+    public StyleType category;      
     public AnimationClip animation;   
     public List<EffectData> effects = new();
+
+    [Header("Swap Behavior")]
+    public bool spawnGhostOnSwap = false;
 }
