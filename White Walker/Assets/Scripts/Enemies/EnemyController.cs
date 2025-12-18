@@ -11,8 +11,7 @@ public class EnemyController : HealthSystem
     {
         base.Die();
         // Muerte personalizada del enemigo
-        Debug.Log("El enemigo ha muerto.");
-        //Destroy(gameObject);
+        Destroy(gameObject);
     }
 
     public void Stun(float duration)
