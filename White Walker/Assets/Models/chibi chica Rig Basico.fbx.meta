@@ -33,7 +33,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: ToonSkin
-    second: {fileID: 2100000, guid: 7be49ba70f156134e8b2cc34106dd06b, type: 2}
+    second: {fileID: 2100000, guid: 2d796734aa8d5b94d8a926e3d3b5d8bb, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
