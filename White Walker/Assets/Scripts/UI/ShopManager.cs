@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,7 +24,6 @@ public class ShopManager : MonoBehaviour
     {
         clawButton.onClick.AddListener(() => ChangeCategory(StyleType.Unarmed));
         swordButton.onClick.AddListener(() => ChangeCategory(StyleType.Armed));
-        gunButton.onClick.AddListener(() => ChangeCategory(StyleType.Gun));
 
         if (PlayerSaveManager.Instance.currentMode == SaveMode.Scriptable)
         {

@@ -1,7 +1,8 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "NewMeleeAttack", menuName = "Soma/MeleeAttack")]
+[CreateAssetMenu(fileName = "New Melee", menuName = "Combat/MeleeAttack")]
 public class MeleeAttack : AttackBase
 {
+    [Header("Combo System")]
     public MeleeAttack nextAttack;
 }

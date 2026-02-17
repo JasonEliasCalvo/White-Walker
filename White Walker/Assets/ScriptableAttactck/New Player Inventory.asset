@@ -15,7 +15,6 @@ MonoBehaviour:
   gold: 300
   unlockedAttacks:
   - {fileID: 11400000, guid: 9afeb241bd0bf104e84048433bab4d3a, type: 2}
-  - {fileID: 11400000, guid: 6ff998470a7aeb2449f65a09fe6d472c, type: 2}
   - {fileID: 11400000, guid: c5a2b9034bfdc3b40bbbbc062a5b205f, type: 2}
   - {fileID: 11400000, guid: 13b87d8059e0cdf4db91e53c3045288d, type: 2}
   - {fileID: 11400000, guid: 80891f518f418d141aab93312d6851ed, type: 2}
@@ -24,8 +23,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 0feff071f8106cd49ac941a486a215ee, type: 2}
   - {fileID: 11400000, guid: 82eed02dd9453c748959a236b5b39941, type: 2}
   ownedAttacks:
-  - {fileID: 11400000, guid: 6ff998470a7aeb2449f65a09fe6d472c, type: 2}
   - {fileID: 11400000, guid: 9afeb241bd0bf104e84048433bab4d3a, type: 2}
   - {fileID: 11400000, guid: c5a2b9034bfdc3b40bbbbc062a5b205f, type: 2}
   - {fileID: 11400000, guid: 13b87d8059e0cdf4db91e53c3045288d, type: 2}
   - {fileID: 11400000, guid: 80891f518f418d141aab93312d6851ed, type: 2}
+  comboClaw: 
+  comboSword: 

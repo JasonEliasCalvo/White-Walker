@@ -71,7 +71,6 @@ public class ComboEditor : MonoBehaviour
     {
         PopulateDropdownsForWeapon(StyleType.Unarmed, GetDropdownsByWeapon(StyleType.Unarmed));
         PopulateDropdownsForWeapon(StyleType.Armed, GetDropdownsByWeapon(StyleType.Armed));
-        PopulateDropdownsForWeapon(StyleType.Gun, GetDropdownsByWeapon(StyleType.Gun));
     }
 
     void PopulateDropdownsForWeapon(StyleType weaponType, TMP_Dropdown[] dropdowns)
@@ -100,7 +99,7 @@ public class ComboEditor : MonoBehaviour
     {
         if (dropdown == claw1 || dropdown == claw2 || dropdown == claw3) return StyleType.Unarmed;
         if (dropdown == sword1 || dropdown == sword2 || dropdown == sword3) return StyleType.Armed;
-        return StyleType.Gun;
+        else return StyleType.Unarmed; // Default, aunque no debería pasar
     }
 
     public void SaveCombo()
@@ -114,12 +113,11 @@ public class ComboEditor : MonoBehaviour
             var save = PlayerSaveManager.Instance.CurrentSave.comboData;
 
             // Eliminamos entradas anteriores
-            save.equippedCombos.RemoveAll(c => c.weaponType == StyleType.Unarmed || c.weaponType == StyleType.Armed || c.weaponType == StyleType.Gun);
+            save.equippedCombos.RemoveAll(c => c.weaponType == StyleType.Unarmed || c.weaponType == StyleType.Armed);
 
             // Guardamos los combos nuevos
             save.equippedCombos.Add(new ComboSet { weaponType = StyleType.Unarmed, attackIDs = clawIDs });
             save.equippedCombos.Add(new ComboSet { weaponType = StyleType.Armed, attackIDs = swordIDs });
-            save.equippedCombos.Add(new ComboSet { weaponType = StyleType.Gun, attackIDs = gunIDs });
 
             PlayerSaveManager.Instance.SaveGame();
             Debug.Log("Combos guardados en JSON");
@@ -128,7 +126,6 @@ public class ComboEditor : MonoBehaviour
         {
             playerInventory.comboClaw = clawIDs;
             playerInventory.comboSword = swordIDs;
-            playerInventory.comboGun = gunIDs;
 
             Debug.Log("Combos guardados en ScriptableObject");
         }
@@ -176,7 +173,6 @@ public class ComboEditor : MonoBehaviour
         {
             ApplySavedCombo(StyleType.Unarmed, playerInventory.comboClaw, new[] { claw1, claw2, claw3 });
             ApplySavedCombo(StyleType.Armed, playerInventory.comboSword, new[] { sword1, sword2, sword3 });
-            ApplySavedCombo(StyleType.Gun, playerInventory.comboGun, new[] { gun });
         }
     }
 
@@ -196,7 +192,6 @@ public class ComboEditor : MonoBehaviour
         {
             StyleType.Unarmed => new[] { claw1, claw2, claw3 },
             StyleType.Armed => new[] { sword1, sword2, sword3 },
-            StyleType.Gun => new[] { gun },
             _ => new TMP_Dropdown[0]
         };
     }
@@ -207,7 +202,6 @@ public class ComboEditor : MonoBehaviour
 
         ApplySavedCombo(StyleType.Unarmed, defaultClawCombo, GetDropdownsByWeapon(StyleType.Unarmed));
         ApplySavedCombo(StyleType.Armed, defaultSwordCombo, GetDropdownsByWeapon(StyleType.Armed));
-        ApplySavedCombo(StyleType.Gun, defaultGunCombo, GetDropdownsByWeapon(StyleType.Gun));
 
         SaveCombo();
     }

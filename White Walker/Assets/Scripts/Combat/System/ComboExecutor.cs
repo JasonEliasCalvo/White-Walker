@@ -36,7 +36,6 @@ public class ComboExecutor : MonoBehaviour
     private void Start()
     {
         LoadCurrentCombo();
-        LoadGunCombo();
         ComboEvents.OnComboChanged += OnComboChanged;
         Debug.Log($"[ComboExecutor] Cambiaste a arma: {currentWeapon}");
     }
@@ -134,16 +133,10 @@ public class ComboExecutor : MonoBehaviour
         }
     }
 
-    void LoadGunCombo()
-    {
-        gunCombo = GetCombo(StyleType.Gun);
-    }
-
     private void OnComboChanged()
     {
         Debug.Log("[ComboExecutor] Combo actualizado desde ComboEditor");
         LoadCurrentCombo();
-        LoadGunCombo();
         currentIndex = 0;
         gunIndex = 0;
     }
@@ -163,7 +156,6 @@ public class ComboExecutor : MonoBehaviour
             {
                 StyleType.Unarmed => inv.comboClaw,
                 StyleType.Armed => inv.comboSword,
-                StyleType.Gun => inv.comboGun,
                 _ => new List<int>()
             };
         }
@@ -254,7 +246,7 @@ public class ComboExecutor : MonoBehaviour
             var target = hit.GetComponent<IDamageable>();
             if (target == null) continue;
 
-            target.TakeDamage(atk.damage);
+            target.TakeDamage(atk.damage, atk.hitStun);
             ApplyEffects(hit, atk);
             break;
         }
