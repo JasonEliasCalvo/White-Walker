@@ -9,23 +9,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3ccbba76a19ca9745858a5e69c8fce35, type: 3}
+  m_Script: {fileID: 11500000, guid: 876bba1f5913c734195f43029edbab5b, type: 3}
   m_Name: Elbow Punching
   m_EditorClassIdentifier: 
-  cost: 10
+  cost: 0
   attackID: 1
-  attackName: Elbow Punching
+  attackName: 
   category: 0
+  executionType: 0
   animation: {fileID: 7400000, guid: 05d58b53476ac8a4781330903a345b25, type: 2}
   damage: 10
   hitStun: 0.5
   knockbackForce: 5
-  duration: 5
+  startupTime: 0
+  activeTime: 0
+  recoveryTime: 0
   effects:
-  - tag: 6
-    power: 0
+  - tag: 1
+    power: 5
     duration: 0
   hitParticle: {fileID: 0}
   hitSound: {fileID: 0}
   spawnGhostOnSwap: 0
-  nextAttack: {fileID: 11400000, guid: 13b87d8059e0cdf4db91e53c3045288d, type: 2}

@@ -8,10 +8,10 @@ public class PlayerFighter : FighterEntity
 
     // --- VARIABLES DE DASH (Necesarias para DashState) ---
     [Header("Dash Settings")]
-    public float dashSpeed = 20f;      // Más rápido que correr
-    public float dashDuration = 0.2f;  // Corto y seco
+    public float dashSpeed = 20f;      
+    public float dashDuration = 0.2f;
     public float dashCooldown = 0.8f;
-    public float dashForceStop = 0.1f; // Frena casi en seco al terminar
+    public float dashForceStop = 0.1f;
 
     [HideInInspector] public float dashTimer;
     [HideInInspector] public float dashCooldownTimer;
@@ -26,6 +26,12 @@ public class PlayerFighter : FighterEntity
     private bool attackPressed;
     private bool interactPressed;
     private float dashCooldownCounter;
+
+    private bool attackBuffer;
+    private float bufferWindow = 0.2f; // Tiempo antes de terminar el ataque donde aceptamos input
+    private float bufferTimer;
+
+    public void ClearBuffer() => attackBuffer = false;
 
     protected override void Awake()
     {
@@ -70,10 +76,23 @@ public class PlayerFighter : FighterEntity
         if (attackPressed)
         {
             attackPressed = false;
-            animator.SetTrigger("Attack");
-            return true;
+            attackBuffer = true;
+            bufferTimer = bufferWindow;
         }
-        return false;
+
+        if (attackBuffer)
+        {
+            bufferTimer -= Time.deltaTime;
+            if (bufferTimer <= 0) attackBuffer = false;
+        }
+
+        return attackBuffer;
+    }
+
+    public override void ConsumeAttackInput()
+    {
+        attackBuffer = false;
+        bufferTimer = 0;
     }
 
     private void HandlePlayerActions()

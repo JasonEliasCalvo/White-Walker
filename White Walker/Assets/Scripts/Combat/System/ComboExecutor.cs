@@ -98,7 +98,7 @@ public class ComboExecutor : MonoBehaviour
         {
             switch (effect.tag)
             {
-                case EffectTag.Stun:
+                case EffectTag.AirLauncher:
                     enemy.Stun(effect.duration);
                     break;
                 case EffectTag.Knockdown:
@@ -252,7 +252,7 @@ public class ComboExecutor : MonoBehaviour
         }
 
         // reproducir animación: animator.Play(atk.animation.name);
-        StartCoroutine(WaitForAttackEnd(atk.duration));
+        StartCoroutine(WaitForAttackEnd(atk.TotalDuration));
     }
 
     IEnumerator WaitForAttackEnd(float duration)

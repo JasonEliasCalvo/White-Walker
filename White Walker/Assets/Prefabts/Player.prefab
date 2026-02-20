@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8605792053655320312}
-  - component: {fileID: 338334011840137179}
   - component: {fileID: 5244815391135045783}
   m_Layer: 0
   m_Name: Player
@@ -34,19 +33,6 @@ Transform:
   - {fileID: 1793124913714703642}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &338334011840137179
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1756258331717772756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 415e97a4a2b4f314f84f124c786df52e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 100
 --- !u!114 &5244815391135045783
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -293,6 +279,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3087817517711563462}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2634531885884801226}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1609695270415687643}
     - targetCorrespondingSourceObject: {fileID: 1251825164071968341, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4558729478795682798}
@@ -356,8 +348,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dedf47684a1fb043a7a292fd9f3d51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatHitbox
-  damage: 0
-  knockback: 0
 --- !u!1 &1416845214859818912 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
@@ -497,8 +487,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38aaeb324cfb4674ca6bc31a78a62ad2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFighter
-  controller: {fileID: 4503637875266045392}
   animator: {fileID: 5621153482001348448}
+  controller: {fileID: 4503637875266045392}
   walkSpeed: 5
   acceleration: 15
   deceleration: 20
@@ -511,7 +501,9 @@ MonoBehaviour:
   rightFootBox: {fileID: 1770615239926042631}
   leftFootBox: {fileID: 8974026273342477408}
   weaponBox: {fileID: 0}
-  currentMove: {fileID: 11400000, guid: 1a2f0b59a0462a54eb8dfea3049e39a0, type: 2}
+  activeCombo: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
+  comboIndex: 0
+  currentAttack: {fileID: 0}
   cameraTransform: {fileID: 8421472312370277668}
   dashSpeed: 20
   dashDuration: 0.2
@@ -535,6 +527,31 @@ MonoBehaviour:
   footstepClips:
   - {fileID: 8300000, guid: 72f526a6a9890f643a88e85a61c86c8a, type: 3}
   - {fileID: 8300000, guid: 85016e0f2b01da248b9663dd49a161b0, type: 3}
+--- !u!114 &2634531885884801226
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b65b3f1129400934b837d46d766fb3fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthComponent
+  maxHealth: 100
+--- !u!114 &1609695270415687643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d658a386c81d48458c6a870169b510d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayableAnimationFighter
 --- !u!4 &1793124913714703642 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
@@ -578,8 +595,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dedf47684a1fb043a7a292fd9f3d51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatHitbox
-  damage: 0
-  knockback: 0
 --- !u!1 &4880230399726866028 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -2534748859332361059, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
@@ -618,8 +633,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dedf47684a1fb043a7a292fd9f3d51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatHitbox
-  damage: 0
-  knockback: 0
 --- !u!95 &5621153482001348448 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
@@ -663,5 +676,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8dedf47684a1fb043a7a292fd9f3d51e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CombatHitbox
-  damage: 0
-  knockback: 0

@@ -1,30 +1,15 @@
 using System;
 using UnityEngine;
 
-public interface IDamageable
-{
-    void TakeDamage(float amount, float hitStun);
-    void Heal(float amount);
-}
-
 // Requerimos estos componentes obligatoriamente
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
 public abstract class FighterEntity : MonoBehaviour, IDamageable
 {
-    // --- SALUD (Traído de HealthSystem) ---
-    [Header("Health System")]
-    [SerializeField] protected float maxHealth = 100f;
-    [SerializeField] protected float currentHealth; // Serializado para ver en inspector
-
-    // Eventos (Muy útiles para la UI luego)
-    public event Action OnDamaged;
-    public event Action OnHealed;
-    public event Action OnDied;
-
     [Header("Core Components")]
-    public CharacterController controller;
     public Animator animator;
+    protected HealthComponent health;
+    public CharacterController controller;
 
     [Header("Movement Stats")]
     public float walkSpeed = 5f;
@@ -57,15 +42,26 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     public CombatHitbox leftFootBox; // 3
     public CombatHitbox weaponBox; // 4
 
+    [Header("Combo Settings")]
+    public ComboSequence activeCombo;
+    [HideInInspector] public int comboIndex = 0;
+
+    public virtual void ConsumeAttackInput() { }
+
+    public bool IsStunned { get; private set; }
+    public bool IsVulnerable { get; private set; }
+    public bool IsInvulnerable { get; set; }
+
     // El ataque que se está ejecutando
-    public MeleeAttack currentAttack;
+    public AttackBase currentAttack;
 
     protected virtual void Awake()
     {
         controller = GetComponent<CharacterController>();
+        health = GetComponent<HealthComponent>();
         animator = GetComponent<Animator>();
 
-        // Inicializamos los estados pasando "this" (la entidad)
+        // Inicializamos estados pasando "this" (la entidad)
         IdleState = new IdleState(this);
         WalkState = new WalkState(this);
         AirborneState = new AirborneState(this);
@@ -74,8 +70,8 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         HitState = new HitState(this);
         DeathState = new DeathState(this);
 
-        // Inicializar Salud
-        currentHealth = maxHealth;
+        // SUSCRIPCIONES IMPORTANTES
+        health.OnDeath += HandleDeath;
     }
 
     protected virtual void Start()
@@ -87,7 +83,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     {
         if (currentState == DeathState) return;
 
-        currentState?.UpdateState();   
+        currentState?.UpdateState();
         ApplyGravity();
 
         Vector3 finalMove = velocity + Vector3.up * verticalVelocity;
@@ -102,21 +98,12 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     // --- SISTEMA DE DAÑO ---
     public virtual void TakeDamage(float amount, float hitStun)
     {
-        if (currentState == DeathState) return;
+        if (IsInvulnerable || currentState == DeathState) return;
 
-        // Reducir vida
-        currentHealth -= amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        health.ApplyDamage(amount);
+        Debug.Log($"{gameObject.name} recibió {amount} de daño. Vida: {health.CurrentHealth}");
 
-        // Feedback
-        Debug.Log($"{gameObject.name} recibió {amount} de daño. Vida: {currentHealth}");
-        OnDamaged?.Invoke();
-
-        if (currentHealth <= 0)
-        {
-            Die();
-        }
-        else
+        if (health.CurrentHealth > 0)
         {
             if (currentState == HitState)
             {
@@ -132,23 +119,16 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         }
     }
 
-    public virtual void Heal(float amount)
+    public void Heal(float amount)
     {
-        if (currentState == DeathState) return;
-
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        OnHealed?.Invoke();
+        health.Heal(amount);
     }
 
-    protected virtual void Die()
+    private void HandleDeath()
     {
         if (currentState == DeathState) return;
 
-        OnDied?.Invoke();
         ChangeState(DeathState);
-
-        // Desactivar colisiones físicas para que no estorbe el cadáver
         controller.enabled = false;
     }
 
@@ -202,6 +182,18 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         currentState?.ExitState();
         currentState = newState;
         currentState.EnterState();
+    }
+
+    public void ResetState(BaseState newState)
+    {
+        currentState?.ExitState();
+        currentState = newState;
+        currentState.EnterState();
+    }
+
+    public void ResetCombo()
+    {
+        comboIndex = 0;
     }
 
     // --- HITBOX MANAGEMENT ---
