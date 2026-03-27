@@ -166,8 +166,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c6a04009889c2e4094721620c14ab62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyFighter
-  controller: {fileID: 8598568212060600753}
   animator: {fileID: 3467792122192869749}
+  controller: {fileID: 8598568212060600753}
   walkSpeed: 5
   acceleration: 15
   deceleration: 20
@@ -180,6 +180,8 @@ MonoBehaviour:
   rightFootBox: {fileID: 0}
   leftFootBox: {fileID: 0}
   weaponBox: {fileID: 0}
+  activeCombo: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
+  comboIndex: 0
   currentAttack: {fileID: 0}
 --- !u!114 &4064051765522365789
 MonoBehaviour:

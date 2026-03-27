@@ -31,7 +31,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     public WalkState WalkState;
     public AirborneState AirborneState;
     public AttackState AttackState;
-    public HitState HitState;
+    public HurtState HurtState;
     public DeathState DeathState;
 
     // --- COMBAT REFERENCES ---
@@ -67,7 +67,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         AirborneState = new AirborneState(this);
 
         AttackState = new AttackState(this);
-        HitState = new HitState(this);
+        HurtState = new HurtState(this);
         DeathState = new DeathState(this);
 
         // SUSCRIPCIONES IMPORTANTES
@@ -105,16 +105,16 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
         if (health.CurrentHealth > 0)
         {
-            if (currentState == HitState)
+            if (currentState == HurtState)
             {
                 // Si ya estamos golpeados, llamamos al método especial de refresco
-                HitState.RefreshHit(hitStun);
+                HurtState.RefreshHit(hitStun);
             }
             else
             {
                 // Si es el primer golpe, entramos al estado normalmente
-                HitState.stunDuration = hitStun;
-                ChangeState(HitState);
+                HurtState.stunDuration = hitStun;
+                ChangeState(HurtState);
             }
         }
     }
@@ -212,6 +212,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
             case 1: leftHandBox?.EnableHitbox(dmg, stun, knock); break;
             case 2: rightFootBox?.EnableHitbox(dmg, stun, knock); break;
             case 3: leftFootBox?.EnableHitbox(dmg, stun, knock); break;
+            case 4: weaponBox?.EnableHitbox(dmg, stun, knock); break;
         }
     }
 
@@ -223,7 +224,17 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
             case 1: leftHandBox?.DisableHitbox(); break;
             case 2: rightFootBox?.DisableHitbox(); break;
             case 3: leftFootBox?.DisableHitbox(); break;
+            case 4: weaponBox?.DisableHitbox(); break;
         }
+    }
+
+    public void CloseAllHitBox()
+    {
+        rightFootBox?.DisableHitbox();
+        leftFootBox?.DisableHitbox();
+        rightHandBox?.DisableHitbox();
+        leftHandBox?.DisableHitbox();
+        weaponBox?.DisableHitbox();
     }
 
     // --- MÉTODOS ABSTRACTOS ---

@@ -1,12 +1,16 @@
 using UnityEngine;
-using static CameraManager;
 
 public class PlayerFighter : FighterEntity
 {
     [Header("Player Specifics")]
     public Transform cameraTransform;
+    private TargetLock targetLock;
 
     // --- VARIABLES DE DASH (Necesarias para DashState) ---
+    [Header("Dash Clips")]
+    public AnimationClip forwardDashClip;
+    public AnimationClip backflipClip;
+
     [Header("Dash Settings")]
     public float dashSpeed = 20f;      
     public float dashDuration = 0.2f;
@@ -36,6 +40,9 @@ public class PlayerFighter : FighterEntity
     protected override void Awake()
     {
         base.Awake();
+
+        targetLock = GetComponent<TargetLock>();
+
         DashState = new DashState(this);
         controls = new PlayerControls();
 
@@ -44,6 +51,7 @@ public class PlayerFighter : FighterEntity
         controls.Gameplay.Attack.performed += ctx => attackPressed = true;
         controls.Gameplay.Dash.performed += ctx => dashPressed = true;
         controls.Gameplay.Interact.performed += ctx => interactPressed = true;
+        controls.Gameplay.LookTarget.performed += ctx => targetLock.ToggleLock();
     }
 
     void OnEnable() => controls.Enable();
@@ -57,18 +65,42 @@ public class PlayerFighter : FighterEntity
 
         if (dashCooldownTimer > 0)
             dashCooldownTimer -= Time.deltaTime;
+
+        if (CameraManager.instance.currentEnemy == null && CameraManager.instance.currentStyle == CameraManager.CameraStyle.Combat)
+        {
+            targetLock.CleanLock();
+        }
     }
 
     public override Vector3 GetMovementInput()
     {
         if (rawInput.sqrMagnitude < 0.1f) return Vector3.zero;
 
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
-        forward.y = 0;
-        right.y = 0;
+        // Declaramos las variables de dirección aquí para usarlas abajo
+        Vector3 moveForward;
+        Vector3 moveRight;
 
-        return (forward.normalized * rawInput.y + right.normalized * rawInput.x).normalized;
+        // --- MODO COMBATE ---
+        if (CameraManager.instance.currentStyle == CameraManager.CameraStyle.Combat && CameraManager.instance.currentEnemy != null)
+        {
+            // El "adelante" es hacia el enemigo
+            moveForward = (CameraManager.instance.currentEnemy.position - transform.position).normalized;
+            moveForward.y = 0;
+
+            // El "derecha" se calcula cruzando el arriba con la dirección al enemigo
+            moveRight = Vector3.Cross(Vector3.up, moveForward);
+
+            return (moveForward * rawInput.y + moveRight * rawInput.x).normalized;
+        }
+
+        // --- MODO EXPLORACIÓN (Cámara Libre) ---
+        // El "adelante" y "derecha" vienen de la cámara libre
+        moveForward = cameraTransform.forward;
+        moveRight = cameraTransform.right;
+        moveForward.y = 0;
+        moveRight.y = 0;
+
+        return (moveForward.normalized * rawInput.y + moveRight.normalized * rawInput.x).normalized;
     }
 
     public override bool GetAttackInput()
@@ -118,18 +150,5 @@ public class PlayerFighter : FighterEntity
     public void StartDashCooldown()
     {
         dashCooldownCounter = dashCooldown;
-    }
-
-    private void HandleMovement()
-    {
-        if (CameraManager.instance.currentStyle == CameraStyle.Basic || CameraManager.instance.currentStyle == CameraStyle.Topdown)
-        {
-            //Vector3 finalVelocity = horizontalVelocity + Vector3.up * verticalVelocity;
-            //controller.Move(finalVelocity * Time.deltaTime);
-        }
-        else if (CameraManager.instance.currentStyle == CameraStyle.Combat)
-        {
-
-        }
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 public class DashState : BaseState
 {
     // Creamos una referencia específica para el Jugador
+    private AnimationClip selectedClip;
     private PlayerFighter player;
     private Vector3 dashDirection;
 
@@ -15,52 +16,85 @@ public class DashState : BaseState
     {
         Debug.Log("Entered Dash State");
 
-        if (player == null)
-        {
-            fighter.ChangeState(fighter.IdleState);
-            return;
-        }
-
-        // 1: Usamos GetMovementInput()
+        var playableSystem = fighter.GetComponent<PlayableAnimationFighter>();
         Vector3 inputDir = fighter.GetMovementInput();
 
         if (inputDir == Vector3.zero)
         {
-            // Backflip (Hacia atrás por defecto)
+            // BACKFLIP (Esquive neutral/atrás)
             dashDirection = -fighter.transform.forward;
-            fighter.animator?.SetTrigger("Dash");
+            selectedClip = player.backflipClip;
         }
         else
         {
-            // Side-step o Forward Dash según el ángulo del input vs forward
             dashDirection = inputDir.normalized;
-            fighter.animator?.SetTrigger("Dash");
+            selectedClip = player.forwardDashClip;
         }
+        // 2. DISPARAR INSTANTÁNEO
+        // Usamos una transición muy corta (0.05s) para que sea un "snap"
+        playableSystem.PlayClip(selectedClip, 0.05f);
 
-        // Para el DUCK: Podrías disparar un estado diferente si Shift está presionado
-
-        // 2: Iniciamos el cooldown en el player
+        // 3. Lógica de físicas
         player.dashTimer = player.dashDuration;
         player.StartDashCooldown();
+
+        // IMPORTANTE: En God Hand el Dash tiene I-Frames (Invencibilidad)
+        fighter.IsInvulnerable = true;
     }
 
     public override void UpdateState()
     {
-        player.dashTimer -= Time.deltaTime;
-        fighter.velocity = dashDirection * player.dashSpeed;
+        // 1. Manejo del Tiempo
+        if (player.dashTimer > 0)
+            player.dashTimer -= Time.deltaTime;
 
-        fighter.verticalVelocity = 0f; 
+        var playableSystem = fighter.GetComponent<PlayableAnimationFighter>();
+        double normalizedTime = playableSystem.GetAttackNormalizedTime();
 
+        if (player.dashTimer > 0)
+        {
+            fighter.velocity = dashDirection * player.dashSpeed;
+        }
+        else
+        {
+            // Frenado suave al terminar el tiempo de dash, pero seguimos en el estado
+            fighter.velocity = Vector3.Lerp(fighter.velocity, Vector3.zero, Time.deltaTime * 10f);
+            fighter.IsInvulnerable = false;
+        }
+
+        fighter.verticalVelocity = 0f;
+
+        // 3. Lógica de Salida
         if (player.dashTimer <= 0f)
         {
-            if (fighter.GetMovementInput().sqrMagnitude > 0.05f)
+            fighter.IsInvulnerable = false;
+
+            if (selectedClip == player.backflipClip)
             {
-                fighter.ChangeState(fighter.WalkState);
+                if (normalizedTime >= 0.95f)
+                {
+                    ExitToLocomotion();
+                }
             }
             else
             {
-                fighter.ChangeState(fighter.IdleState);
+                ExitToLocomotion();
             }
+        }
+    }
+
+    private void ExitToLocomotion()
+    {
+        var playableSystem = fighter.GetComponent<PlayableAnimationFighter>();
+        playableSystem.StopAttack(0.15f); // Volvemos suave al Idle/Walk
+
+        if (fighter.GetMovementInput().sqrMagnitude > 0.05f)
+        {
+            fighter.ChangeState(fighter.WalkState);
+        }
+        else
+        {
+            fighter.ChangeState(fighter.IdleState);
         }
     }
 

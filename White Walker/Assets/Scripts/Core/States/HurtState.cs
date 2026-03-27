@@ -1,13 +1,14 @@
+using TMPro;
 using UnityEngine;
 
-public class HitState : BaseState
+public class HurtState : BaseState
 {
     public float stunDuration = 0.5f;
     private float timer;
 
     private bool mirrorToggle = false;
 
-    public HitState(FighterEntity fighter) : base(fighter) { }
+    public HurtState(FighterEntity fighter) : base(fighter) { }
     public override bool CanBeInterrupted => false;
 
     public override void EnterState()
@@ -35,6 +36,11 @@ public class HitState : BaseState
         mirrorToggle = !mirrorToggle;
 
         PlayHitAnimation();
+    }
+
+    public void ApplyHit(Vector3 direction, float force)
+    {
+        fighter.velocity = direction * force;
     }
 
     private void PlayHitAnimation()

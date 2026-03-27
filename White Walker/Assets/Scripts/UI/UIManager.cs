@@ -14,8 +14,6 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject ComboEditorPanel;
     [SerializeField] private TextMeshProUGUI dialogueText;
 
-    [Header("UI Settings")]
-    public KeyCode dialogueKey = KeyCode.F;
 
     private void Awake()
     {
@@ -32,10 +30,6 @@ public class UIManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyUp(dialogueKey))
-        {
-            ShowComboEditorPanel(true);
-        }
     }
 
     public void ShowInteractablePanel(bool state)

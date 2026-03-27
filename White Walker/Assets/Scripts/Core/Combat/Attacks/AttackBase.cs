@@ -2,42 +2,55 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum StyleType { Unarmed, Armed }
-
 public enum ExecutionType { Hitbox, Grab, Finisher }
+
+public enum CancelType{ None, Normal, Jump, Dodge, Any }
 
 [CreateAssetMenu(fileName = "New Attack", menuName = "Combat/Attack")]
 public class AttackBase : ScriptableObject
 {
+    [System.Serializable]
+    public class AttackEvent
+    {
+        public float time; // Tiempo desde inicio del ataque
+        public AttackEventType type;
+        public int hitboxIndex;
+    }
+
+    public enum AttackEventType
+    {
+        OpenHitbox,
+        CloseHitbox
+    }
+
     [Header("Identidad")]
-    public int cost;
     public int attackID;
     public string attackName;
-    public StyleType category;
     public ExecutionType executionType;
     public AnimationClip animation;
+    public float blendTime = 0.08f;
+    public float playSpeed = 1f;
 
     [Header("Stats Básicos")]
+    public int cost;
     public float damage = 10f;
     public float hitStun = 0.5f;
     public float knockbackForce = 5f;
+    public int priority;
+    public bool superArmor;
 
-    [Header("Frame Data")]
-    public float startupTime;
-    public float activeTime;
-    public float recoveryTime;
+    [Header("Attack Timeline")]
+    public List<AttackEvent> events = new List<AttackEvent>();
 
     [Header("Efectos Avanzados")]
     public List<EffectData> effects = new List<EffectData>();
 
+    [Header("Cancel Rules")]
+    public CancelType cancelType;
+
     [Header("VFX & SFX")]
     public GameObject hitParticle;
     public AudioClip hitSound;
-
-    [Header("Swap Behavior")]
-    public bool spawnGhostOnSwap = false;
-
-    public float TotalDuration => startupTime + activeTime + recoveryTime;
 
     public virtual bool CanExecute(FighterEntity user, FighterEntity target)
     {
@@ -58,21 +71,4 @@ public class AttackBase : ScriptableObject
                 return false;
         }
     }
-}
-
-public enum EffectTag { 
-    None,
-    BreakGuard,
-    AirLauncher,
-    Knockdown,
-    HeavyHit,
-    LowAttack, 
-}
-
-[Serializable]
-public struct EffectData
-{
-    public EffectTag tag;
-    public float power;
-    public float duration;
 }

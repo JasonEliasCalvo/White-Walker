@@ -19,6 +19,24 @@ public class CombatHitbox : MonoBehaviour
         myCollider.enabled = false;
     }
 
+    public void CheckHitbox()
+    {
+        Collider[] hits = Physics.OverlapSphere(transform.position, radius);
+
+        foreach (var hit in hits)
+        {
+            if (hit.gameObject == owner.gameObject) continue;
+
+            IDamageable target = hit.GetComponent<IDamageable>();
+            if (target == null || victims.Contains(target)) continue;
+
+            victims.Add(target);
+            target.TakeDamage(damage, hitStun);
+
+            ApplyKnockback(target);
+        }
+    }
+
     public void EnableHitbox(float dmg, float stun, float force)
     {
         damage = dmg;

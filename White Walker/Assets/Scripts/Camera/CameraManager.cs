@@ -1,12 +1,17 @@
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraManager : MonoBehaviour
 {
     public static CameraManager instance;
-    public GameObject basicCam;
-    public GameObject combatCam;
-    public GameObject topDownCam;
+
+    [Header("Targets")]
+    public Transform playerTransform;
+    public Transform currentEnemy;
+
+    public CameraController basicCam;
+    public CombatCameraController combatCam;
 
     public Camera manualCamera;
     public CinemachineCamera cinematicCam;
@@ -15,7 +20,6 @@ public class CameraManager : MonoBehaviour
     {
         Basic,
         Combat,
-        Topdown,
         Cinematic
     }
 
@@ -30,28 +34,36 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         manualCamera.enabled = true;
-        //cinematicCam.gameObject.SetActive(false);
         SwitchCameraStyle(CameraStyle.Basic);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchCameraStyle(CameraStyle.Basic);
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchCameraStyle(CameraStyle.Combat);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SwitchCameraStyle(CameraStyle.Topdown);
+        if (Keyboard.current.digit1Key.wasPressedThisFrame)
+            SwitchCameraStyle(CameraStyle.Basic);
+
+        if (Keyboard.current.digit2Key.wasPressedThisFrame)
+            SwitchCameraStyle(CameraStyle.Combat);
+    }
+
+    public Vector3 GetCombatAnchor()
+    {
+        if (currentEnemy == null) return playerTransform.position;
+
+        // Calculamos el centro exacto entre los dos
+        return (playerTransform.position + currentEnemy.position) / 2f;
     }
 
     public void SwitchCameraStyle(CameraStyle newStyle)
     {
-        basicCam.SetActive(false);
-        combatCam.SetActive(false);
-        topDownCam.SetActive(false);
+        basicCam.enabled = false;
+        combatCam.enabled = false;
 
-        if (newStyle == CameraStyle.Basic) basicCam.SetActive(true);
-        if (newStyle == CameraStyle.Combat) combatCam.SetActive(true);
-        if (newStyle == CameraStyle.Topdown) topDownCam.SetActive(true);
+        if (newStyle == CameraStyle.Basic) basicCam.enabled = true;
+        if (newStyle == CameraStyle.Combat) combatCam.enabled = true;
 
         currentStyle = newStyle;
+        Debug.Log("Camera style switched to: " + newStyle);
     }
 
     public void PlayCinematic()

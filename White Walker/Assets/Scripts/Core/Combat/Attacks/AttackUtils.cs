@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -23,4 +24,22 @@ public static class AttackUtils
                 return effect.duration;
         return 0f;
     }
+}
+
+public enum EffectTag
+{
+    None,
+    BreakGuard,
+    AirLauncher,
+    Knockdown,
+    HeavyHit,
+    LowAttack,
+}
+
+[Serializable]
+public struct EffectData
+{
+    public EffectTag tag;
+    public float power;
+    public float duration;
 }

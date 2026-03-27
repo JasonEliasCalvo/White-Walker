@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class CameraController : MonoBehaviour
 {
@@ -20,14 +21,14 @@ public class CameraController : MonoBehaviour
     public int zoomVelocity = 300;
     public float zoomSmoth = 0.1f;
     public float rotationSmooth = 0.1f;
-    public Vector2 sensitivity = new Vector2(1, 1);
+    public Vector2 sensitivity = new Vector2(1f, 1f);
 
-    [Header("Inclinación tipo God of War")]
+    [Header("Inclinación")]
     public float tiltAmount = 10f;
     public float tiltSmooth = 10f;
     private float currentTilt = 0f;
 
-    [Header("Layer de colisión")]
+    [Header("Variables Internas")]
     private Vector2 angle = new Vector2(90 * Mathf.Deg2Rad, 0);
     private new Camera camera;
     private Vector2 nearPlaneSize;
@@ -78,19 +79,21 @@ public class CameraController : MonoBehaviour
 
     void Update()
     {
-        float hor = Input.GetAxis("Mouse X");
-        if (hor != 0)
-            angle.x += hor * Mathf.Deg2Rad * sensitivity.x;
+        if (Mouse.current == null) return;
 
-        float ver = Input.GetAxis("Mouse Y");
-        if (ver != 0)
+        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
+
+        if (mouseDelta.x != 0)
+            angle.x += mouseDelta.x * Mathf.Deg2Rad * sensitivity.x;
+
+        if (mouseDelta.y != 0)
         {
-            angle.y += ver * Mathf.Deg2Rad * sensitivity.y;
+            angle.y += mouseDelta.y * Mathf.Deg2Rad * sensitivity.y;
             angle.y = Mathf.Clamp(angle.y, -verticalLimit * Mathf.Deg2Rad, verticalLimit * Mathf.Deg2Rad);
         }
 
         // Zoom
-        float scrollDelta = Input.GetAxis("Mouse ScrollWheel");
+        float scrollDelta = Mouse.current.scroll.y.ReadValue();
 
         if (scrollDelta > 0)
             newDistance -= 0.1f * (Time.deltaTime * zoomVelocity);
