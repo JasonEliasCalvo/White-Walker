@@ -197,11 +197,10 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     }
 
     // --- HITBOX MANAGEMENT ---
-    public void AnimEvent_OpenHitbox(int limbIndex)
+    public void OpenHitbox(int limbIndex)
     {
         if (currentAttack == null) return;
 
-        // Extraemos datos de tu ScriptableObject
         float dmg = currentAttack.damage;
         float stun = currentAttack.hitStun;
         float knock = currentAttack.knockbackForce;
@@ -216,7 +215,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         }
     }
 
-    public void AnimEvent_CloseHitbox(int limbIndex)
+    public void CloseHitbox(int limbIndex)
     {
         switch (limbIndex)
         {

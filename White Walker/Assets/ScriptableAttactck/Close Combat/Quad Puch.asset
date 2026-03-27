@@ -12,19 +12,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 876bba1f5913c734195f43029edbab5b, type: 3}
   m_Name: Quad Puch
   m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
-  cost: 0
   attackID: 2
   attackName: Quad Puch
-  category: 0
   executionType: 0
   animation: {fileID: 7400000, guid: 03b4cbf838c7f7749a3249c0fc0c50e4, type: 2}
+  blendTime: 0.08
+  cost: 0
   damage: 10
   hitStun: 0.5
   knockbackForce: 5
-  startupTime: 0
-  activeTime: 0
-  recoveryTime: 0
+  superArmor: 0
+  events:
+  - time: 0.26
+    type: 0
+    hitboxIndex: 1
+  - time: 0.3
+    type: 1
+    hitboxIndex: 1
+  - time: 0.36
+    type: 0
+    hitboxIndex: 0
+  - time: 0.4
+    type: 1
+    hitboxIndex: 0
+  - time: 0.46
+    type: 0
+    hitboxIndex: 1
+  - time: 0.5
+    type: 1
+    hitboxIndex: 1
+  - time: 0.6
+    type: 0
+    hitboxIndex: 0
+  - time: 0.6
+    type: 0
+    hitboxIndex: 0
+  comboWindowStart: 0.7
   effects: []
   hitParticle: {fileID: 0}
   hitSound: {fileID: 0}
-  spawnGhostOnSwap: 0

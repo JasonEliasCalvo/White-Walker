@@ -24,7 +24,6 @@ public class IdleState : BaseState
         // 2. Verificar si queremos atacar
         if (fighter.GetAttackInput())
         {
-            // IMPORTANTE: Configurar el inicio del combo aquí
             fighter.ResetCombo(); // Ponemos index a 0
 
             // Asignamos el primer ataque

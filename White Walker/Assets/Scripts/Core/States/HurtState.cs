@@ -57,10 +57,10 @@ public class HurtState : BaseState
         fighter.animator.Play("Hit", -1, 0f);
 
         // Reset de Hitboxes por seguridad
-        fighter.AnimEvent_CloseHitbox(0);
-        fighter.AnimEvent_CloseHitbox(1);
-        fighter.AnimEvent_CloseHitbox(2);
-        fighter.AnimEvent_CloseHitbox(3);
+        fighter.CloseHitbox(0);
+        fighter.CloseHitbox(1);
+        fighter.CloseHitbox(2);
+        fighter.CloseHitbox(3);
     }
 
     public override void ExitState()

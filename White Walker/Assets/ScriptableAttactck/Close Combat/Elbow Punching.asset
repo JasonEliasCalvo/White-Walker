@@ -12,22 +12,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 876bba1f5913c734195f43029edbab5b, type: 3}
   m_Name: Elbow Punching
   m_EditorClassIdentifier: 
-  cost: 0
   attackID: 1
   attackName: 
-  category: 0
   executionType: 0
   animation: {fileID: 7400000, guid: 05d58b53476ac8a4781330903a345b25, type: 2}
+  blendTime: 0.08
+  playSpeed: 1
+  cost: 0
   damage: 10
   hitStun: 0.5
   knockbackForce: 5
-  startupTime: 0
-  activeTime: 0
-  recoveryTime: 0
+  superArmor: 0
+  events:
+  - time: 0.26
+    type: 0
+    hitboxIndex: 0
+  - time: 0.43
+    type: 1
+    hitboxIndex: 0
+  comboWindowStart: 0.5
   effects:
   - tag: 1
     power: 5
     duration: 0
   hitParticle: {fileID: 0}
   hitSound: {fileID: 0}
-  spawnGhostOnSwap: 0

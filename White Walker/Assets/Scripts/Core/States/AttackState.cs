@@ -1,75 +1,106 @@
 using System;
 using UnityEngine;
+using static AttackBase;
 
 public class AttackState : BaseState
 {
-    public AttackState(FighterEntity fighter) : base(fighter) { }
-
     private float attackTimer;
+    private int eventIndex;
+
+    public AttackState(FighterEntity fighter) : base(fighter) { }
 
     public override void EnterState()
     {
         Debug.Log("Entered Attack State");
 
-        attackTimer = 0f;
         fighter.ConsumeAttackInput();
+
+        attackTimer = 0f;
+        eventIndex = 0;
+
         PlayAttackAnimation();
     }
 
     public override void UpdateState()
     {
+        if (fighter.currentAttack == null)
+            return;
+
         attackTimer += Time.deltaTime;
 
         var atk = fighter.currentAttack;
-        if (atk == null) return;
-
-        fighter.MoveEntity(Vector3.zero, 0);
 
         var playableSystem = fighter.GetComponent<PlayableAnimationFighter>();
         double normalizedTime = playableSystem.GetAttackNormalizedTime();
 
-        // --- VENTANA DE CANCELACIÓN ---
-        if (normalizedTime > 0.6f)
+        if (attackTimer >= atk.TotalDuration)
+        {
+            fighter.GetComponent<PlayableAnimationFighter>().StopAttack(.15f);
+            fighter.ChangeState(fighter.IdleState);
+        }
+ 
+        // PROCESAR EVENTOS
+        while (eventIndex < atk.events.Count && attackTimer >= atk.events[eventIndex].time)
+        {
+            ProcessEvent(atk.events[eventIndex]);
+            eventIndex++;
+        }
+
+        // BLOQUEAR MOVIMIENTO
+        fighter.MoveEntity(Vector3.zero, 0);
+
+        // VENTANA DE COMBO
+        if (attackTimer >= atk.comboWindowStart)
         {
             if (fighter.GetAttackInput())
             {
-                Debug.Log("Input detected for next attack in combo!");
                 AdvanceCombo();
                 return;
             }
         }
 
-        if (normalizedTime >= 0.95f)
+        // FIN DEL ATAQUE
+        if (attackTimer >= atk.TotalDuration)
         {
-            fighter.GetComponent<PlayableAnimationFighter>().StopAttack(.15f);
             fighter.ChangeState(fighter.IdleState);
+        }
+    }
+
+    private void ProcessEvent(AttackEvent e)
+    {
+        switch (e.type)
+        {
+            case AttackEventType.OpenHitbox:
+                fighter.OpenHitbox(e.hitboxIndex);
+                break;
+
+            case AttackEventType.CloseHitbox:
+                fighter.CloseHitbox(e.hitboxIndex);
+                break;
         }
     }
 
     public void AdvanceCombo()
     {
         fighter.comboIndex++;
+
         if (fighter.comboIndex >= fighter.activeCombo.attacks.Count)
-        {
             fighter.comboIndex = 0;
-        }
 
         fighter.currentAttack = fighter.activeCombo.attacks[fighter.comboIndex];
         fighter.ConsumeAttackInput();
 
-        PlayAttackAnimation();
+        EnterState();
     }
 
     private void PlayAttackAnimation()
     {
-        AttackBase attack = fighter.currentAttack;
+        var attack = fighter.currentAttack;
         if (attack == null) { fighter.ChangeState(fighter.IdleState); return; }
 
-        var playableSystem = fighter.GetComponent<PlayableAnimationFighter>();
+        var PlayClip = fighter.GetComponent<PlayableAnimationFighter>();
+        PlayClip.PlayClip(attack.animation, attack.blendTime);
 
-        // 0.1f es el tiempo de mezcla. God Hand es rápido, así que valores bajos funcionan mejor.
-        playableSystem.PlayClip(attack.animation, 0.1f);
-        
         fighter.CloseAllHitBox();
     }
 

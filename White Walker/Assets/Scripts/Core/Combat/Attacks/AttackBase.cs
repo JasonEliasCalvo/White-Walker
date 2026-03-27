@@ -2,19 +2,20 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 
-public enum ExecutionType { Hitbox, Grab, Finisher }
+public enum ExecutionType { Hit, Grab, Finisher }
 
-public enum CancelType{ None, Normal, Jump, Dodge, Any }
+public enum CancelType{ None, attack, Dodge, Any }
 
 [CreateAssetMenu(fileName = "New Attack", menuName = "Combat/Attack")]
 public class AttackBase : ScriptableObject
 {
-    [System.Serializable]
+    [Serializable]
     public class AttackEvent
     {
         public float time; // Tiempo desde inicio del ataque
         public AttackEventType type;
         public int hitboxIndex;
+        public int GetTick() => Mathf.RoundToInt(time * 60f);
     }
 
     public enum AttackEventType
@@ -29,24 +30,32 @@ public class AttackBase : ScriptableObject
     public ExecutionType executionType;
     public AnimationClip animation;
     public float blendTime = 0.08f;
-    public float playSpeed = 1f;
 
     [Header("Stats Básicos")]
     public int cost;
     public float damage = 10f;
     public float hitStun = 0.5f;
     public float knockbackForce = 5f;
-    public int priority;
     public bool superArmor;
 
     [Header("Attack Timeline")]
     public List<AttackEvent> events = new List<AttackEvent>();
+    public float comboWindowStart = 0.5f;
+    public float TotalDuration
+    {
+        get
+        {
+            if (events.Count == 0) return animation.length;
+            float lastEventTime = events[events.Count - 1].time;
+            return Mathf.Max(lastEventTime, animation.length);
+        }
+    }
 
     [Header("Efectos Avanzados")]
     public List<EffectData> effects = new List<EffectData>();
 
-    [Header("Cancel Rules")]
-    public CancelType cancelType;
+   // Header("Cancel Rules")]
+   // public CancelType cancelType;
 
     [Header("VFX & SFX")]
     public GameObject hitParticle;
@@ -58,7 +67,7 @@ public class AttackBase : ScriptableObject
 
         switch (executionType)
         {
-            case ExecutionType.Hitbox:
+            case ExecutionType.Hit:
                 return true;
 
             case ExecutionType.Grab:
