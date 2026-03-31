@@ -1,11 +1,19 @@
-using System;
 using UnityEngine;
+
+public interface IFighterInput
+{
+    bool AttackPressed();
+    bool DodgePressed();
+    Vector2 MoveInput();
+    void ConsumeInput();
+}
 
 // Requerimos estos componentes obligatoriamente
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
 public abstract class FighterEntity : MonoBehaviour, IDamageable
 {
+
     [Header("Core Components")]
     public Animator animator;
     protected HealthComponent health;
@@ -18,6 +26,10 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     public float gravity = -9.81f;
     public float rotationSmoothTime = 0.12f;
 
+    [Header("Frame Logic")]
+    private const float TICK_RATE = 1f / 60f; // 60 FPS Lógicos (0.01666... seg)
+    private float tickTimer = 0f;
+
     // Físicas
     [HideInInspector] public Vector3 velocity;
     [HideInInspector] public float verticalVelocity;
@@ -29,7 +41,8 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     // --- ESTADOS (Instancias) ---
     public IdleState IdleState;
     public WalkState WalkState;
-    public AirborneState AirborneState;
+    public DodgeState dodgeState;
+    public AerialState aerialState;
     public AttackState AttackState;
     public HurtState HurtState;
     public DeathState DeathState;
@@ -53,18 +66,20 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     public bool IsInvulnerable { get; set; }
 
     // El ataque que se está ejecutando
-    public AttackBase currentAttack;
+    public AttackData currentAttack;
+    public IFighterInput InputHandler { get; private set; }
 
     protected virtual void Awake()
     {
         controller = GetComponent<CharacterController>();
         health = GetComponent<HealthComponent>();
         animator = GetComponent<Animator>();
+        InputHandler = GetComponent<IFighterInput>();
 
         // Inicializamos estados pasando "this" (la entidad)
         IdleState = new IdleState(this);
         WalkState = new WalkState(this);
-        AirborneState = new AirborneState(this);
+        aerialState = new AerialState(this);
 
         AttackState = new AttackState(this);
         HurtState = new HurtState(this);
@@ -83,16 +98,22 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     {
         if (currentState == DeathState) return;
 
-        currentState?.UpdateState();
+        tickTimer += Time.deltaTime;
+        while (tickTimer >= TICK_RATE)
+        {
+            TickLogic();
+            tickTimer -= TICK_RATE;
+        }
+
         ApplyGravity();
 
         Vector3 finalMove = velocity + Vector3.up * verticalVelocity;
         controller.Move(finalMove * Time.deltaTime);
     }
 
-    protected virtual void FixedUpdate()
+    private void TickLogic()
     {
-        currentState?.FixedUpdateState();
+        currentState?.UpdateState();
     }
 
     // --- SISTEMA DE DAÑO ---
@@ -197,13 +218,9 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     }
 
     // --- HITBOX MANAGEMENT ---
-    public void OpenHitbox(int limbIndex)
+    public void OpenHitbox(int limbIndex, float dmg, float stun, float knock)
     {
         if (currentAttack == null) return;
-
-        float dmg = currentAttack.damage;
-        float stun = currentAttack.hitStun;
-        float knock = currentAttack.knockbackForce;
 
         switch (limbIndex)
         {

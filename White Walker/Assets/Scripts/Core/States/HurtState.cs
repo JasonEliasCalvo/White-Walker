@@ -68,6 +68,4 @@ public class HurtState : BaseState
         // Opcional: Resetear el mirror al salir para que el próximo golpe empiece "normal"
         // mirrorToggle = false; 
     }
-
-    public override void FixedUpdateState() { }
 }

@@ -4,5 +4,5 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CombatDatabase", menuName = "Combat Database")]
 public class AttackDataSO : ScriptableObject
 {
-    public List<AttackBase> allAttacks;
+    public List<AttackData> allAttacks;
 }

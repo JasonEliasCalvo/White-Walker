@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class AirborneState : BaseState
+public class AerialState : BaseState
 {
-    public AirborneState(FighterEntity fighter) : base(fighter) { }
+    public AerialState(FighterEntity fighter) : base(fighter) { }
 
     public override void EnterState()
     {
@@ -45,9 +45,5 @@ public class AirborneState : BaseState
     {
         // Al salir, avisamos al animator que ya tocamos tierra
         fighter.animator?.SetBool("IsGrounded", true);
-    }
-
-    public override void FixedUpdateState()
-    {
     }
 }

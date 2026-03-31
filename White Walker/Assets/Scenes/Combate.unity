@@ -877,7 +877,6 @@ GameObject:
   - component: {fileID: 85469882}
   - component: {fileID: 85469885}
   - component: {fileID: 85469884}
-  - component: {fileID: 85469883}
   m_Layer: 5
   m_Name: ComboEditotrPanel
   m_TagString: Untagged
@@ -907,29 +906,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &85469883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 85469881}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc9e8ad8952ea174caf6736732fe0999, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  claw1: {fileID: 1118695895}
-  claw2: {fileID: 1754648899}
-  claw3: {fileID: 703521737}
-  sword1: {fileID: 238520414}
-  sword2: {fileID: 1635064806}
-  sword3: {fileID: 1817621741}
-  gun: {fileID: 1406599944}
-  playerInventory: {fileID: 11400000, guid: e4018262d80146442b8d2578b1e99c89, type: 2}
-  defaultClawCombo: 010000000200000003000000
-  defaultSwordCombo: 050000000600000007000000
-  defaultGunCombo: 09000000
 --- !u!114 &85469884
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2768,7 +2744,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 85469883}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ComboEditor, Assembly-CSharp
         m_MethodName: SaveCombo
         m_Mode: 1
@@ -4600,7 +4576,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 85469883}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: ComboEditor, Assembly-CSharp
         m_MethodName: ResetToDefaultCombos
         m_Mode: 1
@@ -11447,7 +11423,6 @@ GameObject:
   - component: {fileID: 1420878792}
   - component: {fileID: 1420878794}
   - component: {fileID: 1420878793}
-  - component: {fileID: 1420878795}
   m_Layer: 5
   m_Name: ShopPanel
   m_TagString: Untagged
@@ -11518,28 +11493,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1420878791}
   m_CullTransparentMesh: 1
---- !u!114 &1420878795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1420878791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73145102081f80d489521d26b47d0fe8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackListContainer: {fileID: 1491767313}
-  attackButtonPrefab: {fileID: 160997001403935273, guid: 2758ce96e80eb4540b961e90e20c2c8d, type: 3}
-  detailPanel: {fileID: 1875409377}
-  equipConfirmPanel: {fileID: 1452926736}
-  comboEditorPanel: {fileID: 85469881}
-  currentCategory: 0
-  clawButton: {fileID: 1227890115}
-  swordButton: {fileID: 1497756289}
-  gunButton: {fileID: 270013061}
-  playerInventory: {fileID: 11400000, guid: e4018262d80146442b8d2578b1e99c89, type: 2}
 --- !u!1 &1429727237
 GameObject:
   m_ObjectHideFlags: 0
@@ -16108,11 +16061,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 573904b7668230b4c9fe817ceec20bf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackNameText: {fileID: 1129832446}
-  damageText: {fileID: 357734145}
-  costText: {fileID: 841996715}
-  effectsText: {fileID: 1325698380}
-  buyButton: {fileID: 677551690}
 --- !u!1 &1880190972
 GameObject:
   m_ObjectHideFlags: 0
@@ -17361,7 +17309,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2099539446}
-  - component: {fileID: 2099539447}
   m_Layer: 0
   m_Name: CombatManager
   m_TagString: Untagged
@@ -17384,19 +17331,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 59520179}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2099539447
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2099539445}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3212a45303b3d454d9124d35f460f2a0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  attackDataSO: {fileID: 11400000, guid: 20e7c8bbb0754ce468a43ba4b94703ac, type: 2}
 --- !u!1 &2108202670
 GameObject:
   m_ObjectHideFlags: 0

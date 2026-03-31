@@ -9,11 +9,6 @@ public class WalkState : BaseState
         Debug.Log("Entered Walk State");
     }
 
-    public override void FixedUpdateState()
-    {
-
-    }
-
     public override void UpdateState()
     {
         // 1. Obtener Input (Del Player o de la IA)
@@ -32,7 +27,7 @@ public class WalkState : BaseState
         // 4. Chequear Caída
         if (!fighter.controller.isGrounded && fighter.verticalVelocity < -2f)
         {
-            fighter.ChangeState(fighter.AirborneState);
+            fighter.ChangeState(fighter.aerialState);
         }
 
         if (fighter.GetAttackInput())

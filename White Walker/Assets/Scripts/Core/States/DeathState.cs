@@ -20,5 +20,4 @@ public class DeathState : BaseState
     }
 
     public override void ExitState() { }
-    public override void FixedUpdateState() { }
 }

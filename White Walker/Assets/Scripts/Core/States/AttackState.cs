@@ -1,83 +1,99 @@
-using System;
+using Combat;
 using UnityEngine;
-using static AttackBase;
 
 public class AttackState : BaseState
 {
-    private float attackTimer;
-    private int eventIndex;
-
     public AttackState(FighterEntity fighter) : base(fighter) { }
 
     public override void EnterState()
     {
-        Debug.Log("Entered Attack State");
+        base.EnterState(); // currentFrame se hace 0 en BaseState
+        Debug.Log($"Entered Attack State: {fighter.currentAttack.attackName}");
 
         fighter.ConsumeAttackInput();
-
-        attackTimer = 0f;
-        eventIndex = 0;
-
         PlayAttackAnimation();
     }
 
     public override void UpdateState()
     {
-        if (fighter.currentAttack == null)
-            return;
-
-        attackTimer += Time.deltaTime;
+        base.UpdateState(); // Incrementa currentFrame en 1
 
         var atk = fighter.currentAttack;
+        if (atk == null) return;
 
-        var playableSystem = fighter.GetComponent<PlayableAnimationFighter>();
-        double normalizedTime = playableSystem.GetAttackNormalizedTime();
-
-        if (attackTimer >= atk.TotalDuration)
+        // 1. EJECUTAR ACCIONES CON LIFECYCLE (Damage, HitBox, Movement, etc.)
+        foreach (var action in atk.actions)
         {
-            fighter.GetComponent<PlayableAnimationFighter>().StopAttack(.15f);
-            fighter.ChangeState(fighter.IdleState);
-        }
- 
-        // PROCESAR EVENTOS
-        while (eventIndex < atk.events.Count && attackTimer >= atk.events[eventIndex].time)
-        {
-            ProcessEvent(atk.events[eventIndex]);
-            eventIndex++;
+            action.Tick(fighter, currentFrame);
         }
 
-        // BLOQUEAR MOVIMIENTO
-        fighter.MoveEntity(Vector3.zero, 0);
-
-        // VENTANA DE COMBO
-        if (attackTimer >= atk.comboWindowStart)
+        // 2. Movimiento fallback
+        if (!IsMovementActionActive(atk))
         {
-            if (fighter.GetAttackInput())
-            {
-                AdvanceCombo();
-                return;
-            }
+            fighter.MoveEntity(Vector3.zero, 0);
         }
 
-        // FIN DEL ATAQUE
-        if (attackTimer >= atk.TotalDuration)
+        // 3. Cancels
+        if (CheckCancels(atk))
+            return; // Si el jugador canceló el ataque, salimos de este Update
+
+        // 4. Fin del ataque
+        if (currentFrame >= atk.totalFrames)
         {
             fighter.ChangeState(fighter.IdleState);
         }
     }
 
-    private void ProcessEvent(AttackEvent e)
+    private bool CheckCancels(AttackData atk)
     {
-        switch (e.type)
+        foreach (var window in atk.cancelWindows)
         {
-            case AttackEventType.OpenHitbox:
-                fighter.OpenHitbox(e.hitboxIndex);
-                break;
+            if (currentFrame < window.startFrame || currentFrame > window.endFrame)
+                continue;
 
-            case AttackEventType.CloseHitbox:
-                fighter.CloseHitbox(e.hitboxIndex);
-                break;
+            switch (window.cancelType)
+            {
+                case CancelType.Attack:
+                    if (fighter.GetAttackInput())
+                    {
+                        AdvanceCombo();
+                        return true;
+                    }
+                    break;
+
+                case CancelType.Dodge:
+                    if (fighter.InputHandler.DodgePressed())
+                    {
+                        fighter.ChangeState(fighter.dodgeState);
+                        return true;
+                    }
+                    break;
+
+                case CancelType.Any:
+                    if (fighter.GetAttackInput())
+                    {
+                        AdvanceCombo();
+                        return true;
+                    }
+                    if (fighter.InputHandler.DodgePressed())
+                    {
+                        fighter.ChangeState(fighter.dodgeState);
+                        return true;
+                    }
+                    break;
+            }
         }
+        return false;
+    }
+
+    private bool IsMovementActionActive(AttackData atk)
+    {
+        foreach (var action in atk.actions)
+        {
+            if (action is MovementAction && currentFrame >= action.startFrame && currentFrame <= action.endFrame)
+                return true;
+        }
+        return false;
     }
 
     public void AdvanceCombo()
@@ -88,9 +104,9 @@ public class AttackState : BaseState
             fighter.comboIndex = 0;
 
         fighter.currentAttack = fighter.activeCombo.attacks[fighter.comboIndex];
-        fighter.ConsumeAttackInput();
 
-        EnterState();
+        // Re-entramos al estado para reiniciar los frames y lanzar la nueva animación
+        fighter.ResetState(this);
     }
 
     private void PlayAttackAnimation()
@@ -98,20 +114,16 @@ public class AttackState : BaseState
         var attack = fighter.currentAttack;
         if (attack == null) { fighter.ChangeState(fighter.IdleState); return; }
 
-        var PlayClip = fighter.GetComponent<PlayableAnimationFighter>();
-        PlayClip.PlayClip(attack.animation, attack.blendTime);
+        var playSystem = fighter.GetComponent<PlayableAnimationFighter>();
+        playSystem.PlayClip(attack.animation, attack.blendTime);
 
         fighter.CloseAllHitBox();
     }
 
     public override void ExitState()
     {
+        base.ExitState();
         fighter.CloseAllHitBox();
         fighter.currentAttack = null;
-    }
-
-    public override void FixedUpdateState()
-    {
-
     }
 }

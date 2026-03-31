@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerFighter : FighterEntity
+public class PlayerFighter : FighterEntity, IFighterInput
 {
     [Header("Player Specifics")]
     public Transform cameraTransform;
@@ -20,13 +20,10 @@ public class PlayerFighter : FighterEntity
     [HideInInspector] public float dashTimer;
     [HideInInspector] public float dashCooldownTimer;
 
-    // Estado único
-    public DashState DashState;
-
     // Input 
     private PlayerControls controls;
     private Vector2 rawInput;
-    private bool dashPressed;
+    private bool dodgePressed;
     private bool attackPressed;
     private bool interactPressed;
     private float dashCooldownCounter;
@@ -42,20 +39,28 @@ public class PlayerFighter : FighterEntity
         base.Awake();
 
         targetLock = GetComponent<TargetLock>();
-
-        DashState = new DashState(this);
         controls = new PlayerControls();
 
         controls.Gameplay.Move.performed += ctx => rawInput = ctx.ReadValue<Vector2>();
         controls.Gameplay.Move.canceled += ctx => rawInput = Vector2.zero;
         controls.Gameplay.Attack.performed += ctx => attackPressed = true;
-        controls.Gameplay.Dash.performed += ctx => dashPressed = true;
+        controls.Gameplay.Dash.performed += ctx => dodgePressed = true;
         controls.Gameplay.Interact.performed += ctx => interactPressed = true;
         controls.Gameplay.LookTarget.performed += ctx => targetLock.ToggleLock();
     }
 
     void OnEnable() => controls.Enable();
     void OnDisable() => controls.Disable();
+
+    public bool AttackPressed() => attackPressed;
+    public bool DodgePressed() => dodgePressed;
+    public Vector2 MoveInput() => rawInput;
+
+    public void ConsumeInput()
+    {
+        attackPressed = false;
+        dodgePressed = false;
+    }
 
     protected override void Update()
     {
@@ -132,10 +137,10 @@ public class PlayerFighter : FighterEntity
         if (currentState != null && !currentState.CanBeInterrupted) return;
 
         // Caso 1: DASH
-        if (dashPressed && dashCooldownTimer <= 0 && controller.isGrounded)
+        if (dodgePressed && dashCooldownTimer <= 0 && controller.isGrounded)
         {
-            dashPressed = false;
-            ChangeState(DashState);
+            dodgePressed = false;
+            ChangeState(dodgeState);
             return;
         }
 

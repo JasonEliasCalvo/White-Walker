@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class DashState : BaseState
+public class DodgeState : BaseState
 {
     // Creamos una referencia específica para el Jugador
     private AnimationClip selectedClip;
     private PlayerFighter player;
     private Vector3 dashDirection;
 
-    public DashState(FighterEntity entity) : base(entity)
+    public DodgeState(FighterEntity entity) : base(entity)
     {
         player = entity as PlayerFighter;
     }
@@ -96,10 +96,6 @@ public class DashState : BaseState
         {
             fighter.ChangeState(fighter.IdleState);
         }
-    }
-
-    public override void FixedUpdateState()
-    {
     }
 
     public override void ExitState()

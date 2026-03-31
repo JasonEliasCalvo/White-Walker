@@ -2,16 +2,15 @@ using System.Collections;
 using UnityEngine;
 public class AttackGhost : MonoBehaviour
 {
-    public AttackBase attackData;
+    public AttackData attackData;
     public Animator animator;
     public float selfDestructDelay = 2f;
 
-    public void Init(AttackBase atk)
+    public void Init(AttackData atk)
     {
         attackData = atk;
         animator = GetComponentInChildren<Animator>();
         animator.Play(atk.animation.name);
-        StartCoroutine(DestroyAfterDelay(atk.TotalDuration));
     }
 
     IEnumerator DestroyAfterDelay(float delay)

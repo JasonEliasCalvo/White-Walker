@@ -9,10 +9,10 @@ public class AttackButtonUI : MonoBehaviour
     private CanvasGroup canvasGroup;
     private Button button;
 
-    private AttackBase currentAttack;
+    private AttackData currentAttack;
     private bool isUnlocked;
     private bool isOwned;
-    private Action<AttackBase> onSelect;
+    private Action<AttackData> onSelect;
 
 
     public void Awake()
@@ -20,7 +20,7 @@ public class AttackButtonUI : MonoBehaviour
         button = GetComponent<Button>();
         canvasGroup = GetComponent<CanvasGroup>();
     }
-    public void Setup(AttackBase attack, bool unlocked, bool owned, Action<AttackBase> onSelectCallback)
+    public void Setup(AttackData attack, bool unlocked, bool owned, Action<AttackData> onSelectCallback)
     {
         currentAttack = attack;
         isUnlocked = unlocked;

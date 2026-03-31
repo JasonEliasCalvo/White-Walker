@@ -7,23 +7,23 @@ public class PlayerInventory : ScriptableObject
     public int gold = 500;
 
     [Tooltip("Todos los ataques desbloqueados (aunque no estén comprados aún)")]
-    public List<AttackBase> unlockedAttacks = new();
+    public List<AttackData> unlockedAttacks = new();
 
     [Tooltip("Ataques que el jugador ya compró")]
-    public List<AttackBase> ownedAttacks = new();
+    public List<AttackData> ownedAttacks = new();
 
     [Header("Combos Equipados")]
     public List<int> comboClaw = new();
     public List<int> comboSword = new();
 
-    public bool IsUnlocked(AttackBase attack) => unlockedAttacks.Contains(attack);
-    public bool IsOwned(AttackBase attack) => ownedAttacks.Contains(attack);
+    public bool IsUnlocked(AttackData attack) => unlockedAttacks.Contains(attack);
+    public bool IsOwned(AttackData attack) => ownedAttacks.Contains(attack);
 
-    public delegate void InventoryEvent(AttackBase attack);
+    public delegate void InventoryEvent(AttackData attack);
     public InventoryEvent eventAttackUnlocked;
     public InventoryEvent eventAttackPurchased;
 
-    public void Unlock(AttackBase attack)
+    public void Unlock(AttackData attack)
     {
         if (!unlockedAttacks.Contains(attack))
         {
@@ -32,7 +32,7 @@ public class PlayerInventory : ScriptableObject
         }
     }
 
-    public void Purchase(AttackBase attack)
+    public void Purchase(AttackData attack)
     {
         if (!ownedAttacks.Contains(attack))
         {
