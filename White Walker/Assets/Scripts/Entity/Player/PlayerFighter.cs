@@ -28,12 +28,6 @@ public class PlayerFighter : FighterEntity, IFighterInput
     private bool interactPressed;
     private float dashCooldownCounter;
 
-    private bool attackBuffer;
-    private float bufferWindow = 0.2f; // Tiempo antes de terminar el ataque donde aceptamos input
-    private float bufferTimer;
-
-    public void ClearBuffer() => attackBuffer = false;
-
     protected override void Awake()
     {
         base.Awake();
@@ -52,7 +46,16 @@ public class PlayerFighter : FighterEntity, IFighterInput
     void OnEnable() => controls.Enable();
     void OnDisable() => controls.Disable();
 
-    public bool AttackPressed() => attackPressed;
+    public bool AttackPressed()
+    {
+        if (attackPressed)
+        {
+            attackPressed = false;
+            return true;
+        }
+        return false;
+    }
+
     public bool DodgePressed() => dodgePressed;
     public Vector2 MoveInput() => rawInput;
 
@@ -106,30 +109,6 @@ public class PlayerFighter : FighterEntity, IFighterInput
         moveRight.y = 0;
 
         return (moveForward.normalized * rawInput.y + moveRight.normalized * rawInput.x).normalized;
-    }
-
-    public override bool GetAttackInput()
-    {
-        if (attackPressed)
-        {
-            attackPressed = false;
-            attackBuffer = true;
-            bufferTimer = bufferWindow;
-        }
-
-        if (attackBuffer)
-        {
-            bufferTimer -= Time.deltaTime;
-            if (bufferTimer <= 0) attackBuffer = false;
-        }
-
-        return attackBuffer;
-    }
-
-    public override void ConsumeAttackInput()
-    {
-        attackBuffer = false;
-        bufferTimer = 0;
     }
 
     private void HandlePlayerActions()

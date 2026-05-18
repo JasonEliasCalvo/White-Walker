@@ -40,6 +40,7 @@ public class AttackState : BaseState
         // 4. Fin del ataque
         if (currentFrame >= atk.totalFrames)
         {
+            fighter.ResetCombo();
             fighter.ChangeState(fighter.IdleState);
         }
     }
@@ -118,6 +119,7 @@ public class AttackState : BaseState
         playSystem.PlayClip(attack.animation, attack.blendTime);
 
         fighter.CloseAllHitBox();
+        Debug.Log("Combo index: " + fighter.comboIndex);
     }
 
     public override void ExitState()

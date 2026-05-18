@@ -30,6 +30,10 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     private const float TICK_RATE = 1f / 60f; // 60 FPS Lógicos (0.01666... seg)
     private float tickTimer = 0f;
 
+    // INPUT BUFFER (NUEVO)
+    private int attackBufferFrames = 0;
+    private const int MAX_BUFFER_FRAMES = 10;
+
     // Físicas
     [HideInInspector] public Vector3 velocity;
     [HideInInspector] public float verticalVelocity;
@@ -58,8 +62,6 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     [Header("Combo Settings")]
     public ComboSequence activeCombo;
     [HideInInspector] public int comboIndex = 0;
-
-    public virtual void ConsumeAttackInput() { }
 
     public bool IsStunned { get; private set; }
     public bool IsVulnerable { get; private set; }
@@ -98,6 +100,15 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     {
         if (currentState == DeathState) return;
 
+        if (InputHandler != null && InputHandler.AttackPressed())
+        {
+            BufferAttackInput();
+        }
+
+        // DECREMENTAR BUFFER
+        if (attackBufferFrames > 0)
+            attackBufferFrames--;
+
         tickTimer += Time.deltaTime;
         while (tickTimer >= TICK_RATE)
         {
@@ -114,6 +125,32 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     private void TickLogic()
     {
         currentState?.UpdateState();
+    }
+
+    public void BufferAttackInput()
+    {
+        attackBufferFrames = MAX_BUFFER_FRAMES;
+    }
+
+    public bool ConsumeBufferedAttack()
+    {
+        if (attackBufferFrames > 0)
+        {
+            attackBufferFrames = 0;
+            return true;
+        }
+        return false;
+    }
+
+    //  ESTE ES EL QUE USA TODO EL SISTEMA
+    public virtual bool GetAttackInput()
+    {
+        return ConsumeBufferedAttack();
+    }
+
+    public virtual void ConsumeAttackInput()
+    {
+        attackBufferFrames = 0;
     }
 
     // --- SISTEMA DE DAÑO ---
@@ -253,7 +290,5 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         weaponBox?.DisableHitbox();
     }
 
-    // --- MÉTODOS ABSTRACTOS ---
     public abstract Vector3 GetMovementInput();
-    public abstract bool GetAttackInput();
 }
