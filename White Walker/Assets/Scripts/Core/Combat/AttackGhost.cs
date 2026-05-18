@@ -2,11 +2,11 @@ using System.Collections;
 using UnityEngine;
 public class AttackGhost : MonoBehaviour
 {
-    public AttackData attackData;
+    public ActionData attackData;
     public Animator animator;
     public float selfDestructDelay = 2f;
 
-    public void Init(AttackData atk)
+    public void Init(ActionData atk)
     {
         attackData = atk;
         animator = GetComponentInChildren<Animator>();

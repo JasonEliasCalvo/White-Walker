@@ -17,7 +17,7 @@ public class IdleState : BaseState
 
         if (moveDir.sqrMagnitude > 0.01f)
         {
-            fighter.ChangeState(fighter.WalkState);
+            fighter.ChangeState(fighter.walkState);
             return;
         }
 
@@ -29,8 +29,8 @@ public class IdleState : BaseState
             // Asignamos el primer ataque
             if (fighter.activeCombo != null && fighter.activeCombo.attacks.Count > 0)
             {
-                fighter.currentAttack = fighter.activeCombo.attacks[0];
-                fighter.ChangeState(fighter.AttackState);
+                fighter.currentAction = fighter.activeCombo.attacks[0];
+                fighter.ChangeState(fighter.attackState);
             }
             return;
         }

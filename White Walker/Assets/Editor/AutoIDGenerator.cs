@@ -14,8 +14,8 @@ public class AutoIDGenerator : AssetPostprocessor
         {
             if (assetPath.EndsWith(".asset"))
             {
-                var attack = AssetDatabase.LoadAssetAtPath<AttackData>(assetPath);
-                if (attack != null && attack.attackID == 0)
+                var attack = AssetDatabase.LoadAssetAtPath<ActionData>(assetPath);
+                if (attack != null && attack.actionID == 0)
                 {
                     AssignUniqueID(attack);
                     EditorUtility.SetDirty(attack);
@@ -25,14 +25,14 @@ public class AutoIDGenerator : AssetPostprocessor
         }
     }
 
-    static void AssignUniqueID(AttackData newAttack)
+    static void AssignUniqueID(ActionData newAttack)
     {
         // Obtener todos los AttackBase existentes
         var guids = AssetDatabase.FindAssets("t:AttackBase");
         var existingIDs = guids
-            .Select(guid => AssetDatabase.LoadAssetAtPath<AttackData>(AssetDatabase.GUIDToAssetPath(guid)))
+            .Select(guid => AssetDatabase.LoadAssetAtPath<ActionData>(AssetDatabase.GUIDToAssetPath(guid)))
             .Where(a => a != null && a != newAttack)
-            .Select(a => a.attackID)
+            .Select(a => a.actionID)
             .ToList();
 
         // Encontrar el siguiente ID libre
@@ -40,6 +40,6 @@ public class AutoIDGenerator : AssetPostprocessor
         while (existingIDs.Contains(nextID))
             nextID++;
 
-        newAttack.attackID = nextID;
+        newAttack.actionID = nextID;
     }
 }

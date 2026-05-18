@@ -1,7 +1,7 @@
 using UnityEngine;
 using static FighterEntity;
 
-public class EnemyFighter : FighterEntity, IFighterInput
+public class EnemyFighter : FighterEntity
 {
     // Lógica simple de IA (Dummy)
     public bool AttackPressed()
@@ -26,12 +26,6 @@ public class EnemyFighter : FighterEntity, IFighterInput
     {
         // Por ahora el dummy no se mueve
         return Vector3.zero;
-    }
-
-    public override bool GetAttackInput()
-    {
-        // Por ahora el dummy no ataca, solo recibe golpes
-        return false;
     }
 
     // Si tuvieras que añadir lógica específica (como mirar al jugador), iría en Update

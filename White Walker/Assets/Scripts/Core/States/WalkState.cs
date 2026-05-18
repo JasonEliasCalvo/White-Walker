@@ -17,12 +17,12 @@ public class WalkState : BaseState
         // 2. Moverse
         fighter.MoveEntity(moveDir, fighter.walkSpeed);
 
-        fighter.RotateEntity(moveDir);
+        //fighter.RotateEntity(moveDir);
         fighter.animator.SetFloat("Speed", moveDir.magnitude);
 
         // 3. Chequear Salidas
         if (moveDir.sqrMagnitude < 0.05f)
-            fighter.ChangeState(fighter.IdleState);
+            fighter.ChangeState(fighter.idleState);
 
         // 4. Chequear Caída
         if (!fighter.controller.isGrounded && fighter.verticalVelocity < -2f)
@@ -37,8 +37,8 @@ public class WalkState : BaseState
             // Asignamos el primer ataque
             if (fighter.activeCombo != null && fighter.activeCombo.attacks.Count > 0)
             {
-                fighter.currentAttack = fighter.activeCombo.attacks[0];
-                fighter.ChangeState(fighter.AttackState);
+                fighter.currentAction = fighter.activeCombo.attacks[0];
+                fighter.ChangeState(fighter.attackState);
             }
             return;
         }

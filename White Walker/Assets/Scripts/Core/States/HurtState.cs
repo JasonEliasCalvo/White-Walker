@@ -23,7 +23,7 @@ public class HurtState : BaseState
         if (timer <= 0)
         {
             // Regresar a Idle
-            fighter.ChangeState(fighter.IdleState);
+            fighter.ChangeState(fighter.idleState);
         }
     }
 

@@ -36,7 +36,6 @@ public class DodgeState : BaseState
 
         // 3. Lógica de físicas
         player.dashTimer = player.dashDuration;
-        player.StartDashCooldown();
 
         // IMPORTANTE: En God Hand el Dash tiene I-Frames (Invencibilidad)
         fighter.IsInvulnerable = true;
@@ -90,11 +89,11 @@ public class DodgeState : BaseState
 
         if (fighter.GetMovementInput().sqrMagnitude > 0.05f)
         {
-            fighter.ChangeState(fighter.WalkState);
+            fighter.ChangeState(fighter.walkState);
         }
         else
         {
-            fighter.ChangeState(fighter.IdleState);
+            fighter.ChangeState(fighter.idleState);
         }
     }
 

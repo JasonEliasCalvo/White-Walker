@@ -1,19 +1,10 @@
 using UnityEngine;
 
-public interface IFighterInput
-{
-    bool AttackPressed();
-    bool DodgePressed();
-    Vector2 MoveInput();
-    void ConsumeInput();
-}
-
 // Requerimos estos componentes obligatoriamente
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(Animator))]
 public abstract class FighterEntity : MonoBehaviour, IDamageable
 {
-
     [Header("Core Components")]
     public Animator animator;
     protected HealthComponent health;
@@ -30,10 +21,6 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     private const float TICK_RATE = 1f / 60f; // 60 FPS Lógicos (0.01666... seg)
     private float tickTimer = 0f;
 
-    // INPUT BUFFER (NUEVO)
-    private int attackBufferFrames = 0;
-    private const int MAX_BUFFER_FRAMES = 10;
-
     // Físicas
     [HideInInspector] public Vector3 velocity;
     [HideInInspector] public float verticalVelocity;
@@ -43,13 +30,13 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     protected BaseState currentState;
 
     // --- ESTADOS (Instancias) ---
-    public IdleState IdleState;
-    public WalkState WalkState;
+    public IdleState idleState;
+    public WalkState walkState;
     public DodgeState dodgeState;
     public AerialState aerialState;
-    public AttackState AttackState;
-    public HurtState HurtState;
-    public DeathState DeathState;
+    public AttackState attackState;
+    public HurtState hurtState;
+    public DeathState deathState;
 
     // --- COMBAT REFERENCES ---
     [Header("Combat System")]
@@ -63,29 +50,27 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     public ComboSequence activeCombo;
     [HideInInspector] public int comboIndex = 0;
 
-    public bool IsStunned { get; private set; }
-    public bool IsVulnerable { get; private set; }
     public bool IsInvulnerable { get; set; }
 
-    // El ataque que se está ejecutando
-    public AttackData currentAttack;
-    public IFighterInput InputHandler { get; private set; }
+    public ActionData currentAction;
+    public bool actionHasHit { get; set; }
+
+    public int currentFrame => currentState != null ? currentState.currentFrame : 0;
 
     protected virtual void Awake()
     {
         controller = GetComponent<CharacterController>();
         health = GetComponent<HealthComponent>();
         animator = GetComponent<Animator>();
-        InputHandler = GetComponent<IFighterInput>();
 
         // Inicializamos estados pasando "this" (la entidad)
-        IdleState = new IdleState(this);
-        WalkState = new WalkState(this);
+        idleState = new IdleState(this);
+        walkState = new WalkState(this);
         aerialState = new AerialState(this);
 
-        AttackState = new AttackState(this);
-        HurtState = new HurtState(this);
-        DeathState = new DeathState(this);
+        attackState = new AttackState(this);
+        hurtState = new HurtState(this);
+        deathState = new DeathState(this);
 
         // SUSCRIPCIONES IMPORTANTES
         health.OnDeath += HandleDeath;
@@ -93,21 +78,12 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
     protected virtual void Start()
     {
-        ChangeState(IdleState);
+        ChangeState(idleState);
     }
 
     protected virtual void Update()
     {
-        if (currentState == DeathState) return;
-
-        if (InputHandler != null && InputHandler.AttackPressed())
-        {
-            BufferAttackInput();
-        }
-
-        // DECREMENTAR BUFFER
-        if (attackBufferFrames > 0)
-            attackBufferFrames--;
+        if (currentState == deathState) return;
 
         tickTimer += Time.deltaTime;
         while (tickTimer >= TICK_RATE)
@@ -127,52 +103,32 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         currentState?.UpdateState();
     }
 
-    public void BufferAttackInput()
-    {
-        attackBufferFrames = MAX_BUFFER_FRAMES;
-    }
-
-    public bool ConsumeBufferedAttack()
-    {
-        if (attackBufferFrames > 0)
-        {
-            attackBufferFrames = 0;
-            return true;
-        }
-        return false;
-    }
-
-    //  ESTE ES EL QUE USA TODO EL SISTEMA
-    public virtual bool GetAttackInput()
-    {
-        return ConsumeBufferedAttack();
-    }
-
-    public virtual void ConsumeAttackInput()
-    {
-        attackBufferFrames = 0;
-    }
-
     // --- SISTEMA DE DAÑO ---
+
+    public bool GetAttackInput()
+    {
+        return true;
+    }
+
     public virtual void TakeDamage(float amount, float hitStun)
     {
-        if (IsInvulnerable || currentState == DeathState) return;
+        if (IsInvulnerable || currentState == deathState) return;
 
         health.ApplyDamage(amount);
         Debug.Log($"{gameObject.name} recibió {amount} de daño. Vida: {health.CurrentHealth}");
 
         if (health.CurrentHealth > 0)
         {
-            if (currentState == HurtState)
+            if (currentState == hurtState)
             {
                 // Si ya estamos golpeados, llamamos al método especial de refresco
-                HurtState.RefreshHit(hitStun);
+                hurtState.RefreshHit(hitStun);
             }
             else
             {
                 // Si es el primer golpe, entramos al estado normalmente
-                HurtState.stunDuration = hitStun;
-                ChangeState(HurtState);
+                hurtState.stunDuration = hitStun;
+                ChangeState(hurtState);
             }
         }
     }
@@ -184,9 +140,9 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
     private void HandleDeath()
     {
-        if (currentState == DeathState) return;
+        if (currentState == deathState) return;
 
-        ChangeState(DeathState);
+        ChangeState(deathState);
         controller.enabled = false;
     }
 
@@ -252,12 +208,13 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     public void ResetCombo()
     {
         comboIndex = 0;
+        actionHasHit = false;
     }
 
     // --- HITBOX MANAGEMENT ---
     public void OpenHitbox(int limbIndex, float dmg, float stun, float knock)
     {
-        if (currentAttack == null) return;
+        if (currentAction == null) return;
 
         switch (limbIndex)
         {

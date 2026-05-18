@@ -5,11 +5,11 @@ public class ComboSlot : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI nameText;
 
-    private AttackData attack;
+    private ActionData attack;
 
-    public void Init(AttackData atk)
+    public void Init(ActionData atk)
     {
         attack = atk;
-        nameText.text = attack.attackName;
+        nameText.text = attack.actionName;
     }
 }

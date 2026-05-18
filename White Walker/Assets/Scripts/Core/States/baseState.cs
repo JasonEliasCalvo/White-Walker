@@ -22,9 +22,7 @@ public abstract class BaseState
     }
 
     public virtual void ExitState()
-        {
-        // Por defecto, no hacemos nada al salir del estado.
-        // Las clases hijas pueden sobreescribir esto para limpiar variables o resetear animaciones.
+    {
     }
 }
 

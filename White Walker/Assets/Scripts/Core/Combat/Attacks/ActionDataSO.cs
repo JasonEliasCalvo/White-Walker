@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "CombatDatabase", menuName = "Combat Database")]
-public class AttackDataSO : ScriptableObject
+public class ActionDataSO : ScriptableObject
 {
-    public List<AttackData> allAttacks;
+    public List<ActionData> allAttacks;
 }

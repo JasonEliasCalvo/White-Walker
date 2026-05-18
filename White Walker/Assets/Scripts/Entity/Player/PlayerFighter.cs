@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PlayerFighter : FighterEntity, IFighterInput
+public class PlayerFighter : FighterEntity
 {
     [Header("Player Specifics")]
     public Transform cameraTransform;
@@ -20,13 +20,16 @@ public class PlayerFighter : FighterEntity, IFighterInput
     [HideInInspector] public float dashTimer;
     [HideInInspector] public float dashCooldownTimer;
 
-    // Input 
+    // Inputs crudos del Unity Input System
     private PlayerControls controls;
     private Vector2 rawInput;
-    private bool dodgePressed;
     private bool attackPressed;
+    private bool dodgePressed;
     private bool interactPressed;
     private float dashCooldownCounter;
+
+    // Tu nueva estructura de traducción para combos estilo Small Fight
+    public Input3DData CurrentInputData { get; private set; }
 
     protected override void Awake()
     {
@@ -35,49 +38,50 @@ public class PlayerFighter : FighterEntity, IFighterInput
         targetLock = GetComponent<TargetLock>();
         controls = new PlayerControls();
 
+        // Suscripción a eventos de Input
         controls.Gameplay.Move.performed += ctx => rawInput = ctx.ReadValue<Vector2>();
         controls.Gameplay.Move.canceled += ctx => rawInput = Vector2.zero;
+        controls.Gameplay.Interact.performed += ctx => interactPressed = true;
         controls.Gameplay.Attack.performed += ctx => attackPressed = true;
         controls.Gameplay.Dash.performed += ctx => dodgePressed = true;
-        controls.Gameplay.Interact.performed += ctx => interactPressed = true;
         controls.Gameplay.LookTarget.performed += ctx => targetLock.ToggleLock();
     }
 
     void OnEnable() => controls.Enable();
     void OnDisable() => controls.Disable();
 
-    public bool AttackPressed()
-    {
-        if (attackPressed)
-        {
-            attackPressed = false;
-            return true;
-        }
-        return false;
-    }
-
-    public bool DodgePressed() => dodgePressed;
-    public Vector2 MoveInput() => rawInput;
-
-    public void ConsumeInput()
-    {
-        attackPressed = false;
-        dodgePressed = false;
-    }
-
     protected override void Update()
     {
-        base.Update();
+        Process3DInput();
 
-        HandlePlayerActions();
+        base.Update();
 
         if (dashCooldownTimer > 0)
             dashCooldownTimer -= Time.deltaTime;
+
+        // Limpieza al final del frame
+        attackPressed = false;
+        dodgePressed = false;
 
         if (CameraManager.instance.currentEnemy == null && CameraManager.instance.currentStyle == CameraManager.CameraStyle.Combat)
         {
             targetLock.CleanLock();
         }
+    }
+
+    private void Process3DInput()
+    {
+        Input3DData data = new Input3DData();
+
+        // Dirección relativa (God Hand style)
+        if (rawInput.y > 0.3f) data.direction = 6; // Adelante
+        else if (rawInput.y < -0.3f) data.direction = 4; // Atrás
+        else data.direction = 5; // Neutral
+
+        data.attackPressed = attackPressed;
+        data.dodgePressed = dodgePressed;
+
+        CurrentInputData = data;
     }
 
     public override Vector3 GetMovementInput()
@@ -109,30 +113,5 @@ public class PlayerFighter : FighterEntity, IFighterInput
         moveRight.y = 0;
 
         return (moveForward.normalized * rawInput.y + moveRight.normalized * rawInput.x).normalized;
-    }
-
-    private void HandlePlayerActions()
-    {
-        if (currentState != null && !currentState.CanBeInterrupted) return;
-
-        // Caso 1: DASH
-        if (dodgePressed && dashCooldownTimer <= 0 && controller.isGrounded)
-        {
-            dodgePressed = false;
-            ChangeState(dodgeState);
-            return;
-        }
-
-        // Caso 2: INTERACTUAR (Tirar cajas, etc)
-        if (interactPressed)
-        {
-            // CheckDistanceToBox()...
-            // ChangeState(InteractState);
-        }
-    }
-
-    public void StartDashCooldown()
-    {
-        dashCooldownCounter = dashCooldown;
     }
 }

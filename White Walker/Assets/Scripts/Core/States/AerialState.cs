@@ -32,11 +32,11 @@ public class AerialState : BaseState
         {
             if (fighter.GetMovementInput().sqrMagnitude > 0.05f)
             {
-                fighter.ChangeState(fighter.WalkState);
+                fighter.ChangeState(fighter.walkState);
             }
             else
             {
-                fighter.ChangeState(fighter.IdleState);
+                fighter.ChangeState(fighter.idleState);
             }
         }
     }

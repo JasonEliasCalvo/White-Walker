@@ -9,10 +9,10 @@ public class AttackButtonUI : MonoBehaviour
     private CanvasGroup canvasGroup;
     private Button button;
 
-    private AttackData currentAttack;
+    private ActionData currentAttack;
     private bool isUnlocked;
     private bool isOwned;
-    private Action<AttackData> onSelect;
+    private Action<ActionData> onSelect;
 
 
     public void Awake()
@@ -20,7 +20,7 @@ public class AttackButtonUI : MonoBehaviour
         button = GetComponent<Button>();
         canvasGroup = GetComponent<CanvasGroup>();
     }
-    public void Setup(AttackData attack, bool unlocked, bool owned, Action<AttackData> onSelectCallback)
+    public void Setup(ActionData attack, bool unlocked, bool owned, Action<ActionData> onSelectCallback)
     {
         currentAttack = attack;
         isUnlocked = unlocked;
@@ -42,13 +42,13 @@ public class AttackButtonUI : MonoBehaviour
         }
         else if (isOwned)
         {
-            attackNameText.text = $"{currentAttack.attackName} - Comprado";
+            attackNameText.text = $"{currentAttack.actionName} - Comprado";
             button.interactable = false;
             canvasGroup.alpha = 0.5f;
         }
         else
         {
-            attackNameText.text = $"{currentAttack.attackName} - {currentAttack.cost}G";
+            attackNameText.text = $"{currentAttack.actionName} - {currentAttack.cost}G";
             button.interactable = true;
             canvasGroup.alpha = 1f;
         }
