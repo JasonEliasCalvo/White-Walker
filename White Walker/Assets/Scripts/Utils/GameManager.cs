@@ -31,17 +31,11 @@ public class GameManager : MonoBehaviour
         Invoke(nameof(GameStart), 0.2f);
     }
 
-    public void SaveGame() => PlayerSaveManager.Instance.SaveGame();
-
-    public void LoadGame() => PlayerSaveManager.Instance.LoadGame();
-
     public void GameStart() => eventGameStart?.Invoke();
     public void GamePause() { }
     public void GameResume() { }
 
     public void GameEnd() => eventGameEnd?.Invoke();
-
-    public void OnClick_SaveButton() => SaveGame();
 
     public void HackingMiniGameStart()
     {

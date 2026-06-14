@@ -55,13 +55,18 @@ public class AttackState : BaseState
     private void PlayAttackAnimation()
     {
         AttackBase attack = fighter.currentAttack;
-        if (attack == null) { fighter.ChangeState(fighter.IdleState); return; }
 
-        // Usando el componente de arriba
-        var player = fighter.GetComponent<PlayableAnimationFighter>();
-        player.PlayClip(attack.animation, 0.1f);
+        if (attack == null)
+        {
+            fighter.ChangeState(fighter.IdleState);
+            return;
+        }
 
-        // Reset de Hitboxes por seguridad
+        fighter.animator.CrossFade(
+            attack.animationStateName,
+            0.05f
+        );
+
         fighter.AnimEvent_CloseHitbox(0);
         fighter.AnimEvent_CloseHitbox(1);
         fighter.AnimEvent_CloseHitbox(2);
