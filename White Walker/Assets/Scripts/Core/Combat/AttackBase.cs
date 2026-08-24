@@ -18,4 +18,6 @@ public class AttackBase : ScriptableObject
     [Header("VFX & SFX")]
     public GameObject hitParticle;
     public AudioClip hitSound;
+    public AudioClip swingSound;
+    public GameObject swingParticlePrefab;
 }

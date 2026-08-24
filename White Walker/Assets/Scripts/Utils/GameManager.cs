@@ -6,17 +6,12 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [SerializeField] private Timer timer;
-
     [Header("Minijuego")]
     [SerializeField] float initiateTime;
 
     public delegate void DelegatedGameStates();
     public DelegatedGameStates eventGameStart;
     public DelegatedGameStates eventGameEnd;
-    public DelegatedGameStates eventHackingMiniGameStart;
-    public DelegatedGameStates eventHackingMiniGameReset;
-    public DelegatedGameStates eventHackingMiniGameEnd;
 
     private void Awake()
     {
@@ -37,15 +32,4 @@ public class GameManager : MonoBehaviour
 
     public void GameEnd() => eventGameEnd?.Invoke();
 
-    public void HackingMiniGameStart()
-    {
-        Debug.Log("initiateTime: " + initiateTime);
-        timer.eventEndTime += ResetHackingMiniGame;
-        timer.Initiate(initiateTime);
-        eventHackingMiniGameStart?.Invoke();
-    }
-
-    public void ResetHackingMiniGame() => eventHackingMiniGameReset?.Invoke();
-    public void HackingMiniGameEnd() => eventHackingMiniGameEnd?.Invoke();
-    public Timer GetTimer() => timer;
 }

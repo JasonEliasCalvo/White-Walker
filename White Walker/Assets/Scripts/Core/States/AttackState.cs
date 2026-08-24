@@ -8,7 +8,8 @@ public class AttackState : BaseState
     public override void EnterState()
     {
        Debug.Log("Entered Attack State");
-
+        fighter.verticalVelocity = 0f;
+        fighter.velocity = Vector3.zero;
         fighter.ConsumeAttackInput();
 
         PlayAttackAnimation();
@@ -19,7 +20,6 @@ public class AttackState : BaseState
         if (fighter.currentAttack == null)
             return;
 
-        fighter.MoveEntity(Vector3.zero, 0);
         AnimatorStateInfo info = fighter.animator.GetCurrentAnimatorStateInfo(0);
 
         // --- VENTANA DE CANCELACIÓN ---
@@ -41,12 +41,12 @@ public class AttackState : BaseState
     public void AdvanceCombo()
     {
         fighter.comboIndex++;
-        if (fighter.comboIndex >= fighter.activeCombo.attacks.Count)
+        if (fighter.comboIndex >= fighter.moveSet.attacks.Count)
         {
             fighter.comboIndex = 0;
         }
 
-        fighter.currentAttack = fighter.activeCombo.attacks[fighter.comboIndex];
+        fighter.currentAttack = fighter.moveSet.attacks[fighter.comboIndex];
         fighter.ConsumeAttackInput();
 
         PlayAttackAnimation();

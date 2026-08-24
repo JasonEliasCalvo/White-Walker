@@ -43,10 +43,6 @@ public class InteractableOptions : MonoBehaviour
 
             case InteractionType.StartMoving:
                 break;
-
-            case InteractionType.StartHackingMiniGame:
-                GameManager.instance.HackingMiniGameStart();
-                break;
         }
     }
 

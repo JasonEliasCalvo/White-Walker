@@ -28,9 +28,9 @@ public class IdleState : BaseState
             fighter.ResetCombo(); // Ponemos index a 0
 
             // Asignamos el primer ataque
-            if (fighter.activeCombo != null && fighter.activeCombo.attacks.Count > 0)
+            if (fighter.moveSet != null && fighter.moveSet.attacks.Count > 0)
             {
-                fighter.currentAttack = fighter.activeCombo.attacks[0];
+                fighter.currentAttack = fighter.moveSet.attacks[0];
                 fighter.ChangeState(fighter.AttackState);
             }
             return;
