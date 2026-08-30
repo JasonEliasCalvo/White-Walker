@@ -11,35 +11,25 @@ public class WalkState : BaseState
 
     public override void FixedUpdateState()
     {
-
+        fighter.Movement.SetHorizontalMovementEnabled(true);
     }
 
     public override void UpdateState()
     {
-        // 1. Obtener Input (Del Player o de la IA)
-        Vector3 moveDir = fighter.GetMovementInput();
+        Vector3 moveDir = fighter.MovementInput;
 
-        // 2. Moverse
-        fighter.MoveEntity(moveDir, fighter.walkSpeed);
-
-        fighter.RotateEntity(moveDir);
         fighter.animator.SetFloat("Speed", moveDir.magnitude);
 
-        // 3. Chequear Salidas
         if (moveDir.sqrMagnitude < 0.05f)
             fighter.ChangeState(fighter.IdleState);
 
-        // 4. Chequear Caída
-        if (!fighter.controller.isGrounded && fighter.verticalVelocity < -2f)
-        {
+        if (!fighter.Movement.IsGrounded && fighter.Movement.VerticalVelocity <= -4f)
             fighter.ChangeState(fighter.AirborneState);
-        }
 
-        if (fighter.GetAttackInput())
+        if (fighter.HasAttackInput())
         {
-            fighter.ResetCombo(); // Ponemos index a 0
+            fighter.ResetCombo();
 
-            // Asignamos el primer ataque
             if (fighter.moveSet != null && fighter.moveSet.attacks.Count > 0)
             {
                 fighter.currentAttack = fighter.moveSet.attacks[0];

@@ -10,9 +10,10 @@ public class DeathState : BaseState
     public override void EnterState()
     {
         Debug.Log("Entered Death State");
-        fighter.velocity = Vector3.zero;
+        fighter.Movement.StopHorizontalMovement();
+        fighter.Movement.SetHorizontalMovementEnabled(false);
+        fighter.Movement.Controller.enabled = false;
         fighter.animator.CrossFade("Death", 0.1f);
-        fighter.controller.enabled = false;
     }
 
     public override void UpdateState()
@@ -21,7 +22,7 @@ public class DeathState : BaseState
         {
             Debug.Log("Death animation finished");
             isDeathAnimationFinished = true;
-            fighter.onDeath?.Invoke();
+            fighter.onDeathEnd?.Invoke();
         }
     }
 

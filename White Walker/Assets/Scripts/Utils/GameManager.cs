@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] float initiateTime;
 
     public delegate void DelegatedGameStates();
-    public DelegatedGameStates eventGameStart;
-    public DelegatedGameStates eventGameEnd;
+    public DelegatedGameStates InitialGameStart;
+    public DelegatedGameStates InitialGameEnd;
 
     private void Awake()
     {
@@ -26,10 +26,10 @@ public class GameManager : MonoBehaviour
         Invoke(nameof(GameStart), 0.2f);
     }
 
-    public void GameStart() => eventGameStart?.Invoke();
+    public void GameStart() => InitialGameStart?.Invoke();
     public void GamePause() { }
     public void GameResume() { }
 
-    public void GameEnd() => eventGameEnd?.Invoke();
+    public void GameEnd() => InitialGameEnd?.Invoke();
 
 }

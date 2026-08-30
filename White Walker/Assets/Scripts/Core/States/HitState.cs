@@ -21,7 +21,6 @@ public class HitState : BaseState
         timer -= Time.deltaTime;
         if (timer <= 0)
         {
-            // Regresar a Idle
             fighter.ChangeState(fighter.IdleState);
         }
     }
@@ -31,7 +30,6 @@ public class HitState : BaseState
         Debug.Log("Hit Refreshed!");
         stunDuration = newDuration;
 
-        // Invertimos el valor del espejo (True -> False -> True)
         mirrorToggle = !mirrorToggle;
 
         PlayHitAnimation();
@@ -39,18 +37,12 @@ public class HitState : BaseState
 
     private void PlayHitAnimation()
     {
-        fighter.velocity = Vector3.zero;
+        fighter.Movement.SetHorizontalMovementEnabled(false);
         timer = stunDuration;
 
-        // 1. Configuramos el espejo antes de reproducir
         fighter.animator.SetBool("MirrorHit", mirrorToggle);
-
-        // 2. Forzamos la reproducción desde el tiempo 0 inmediatamente
-        // "Hit" es el nombre del Estado en el Animator, no del Clip.
-        // -1 es la capa base, 0f es el tiempo normalized (principio).
         fighter.animator.Play("Hit", -1, 0f);
 
-        // Reset de Hitboxes por seguridad
         fighter.AnimEvent_CloseHitbox(0);
         fighter.AnimEvent_CloseHitbox(1);
         fighter.AnimEvent_CloseHitbox(2);
@@ -59,8 +51,8 @@ public class HitState : BaseState
 
     public override void ExitState()
     {
-        // Opcional: Resetear el mirror al salir para que el próximo golpe empiece "normal"
-        // mirrorToggle = false; 
+        mirrorToggle = false;
+        fighter.Movement.SetHorizontalMovementEnabled(true);
     }
 
     public override void FixedUpdateState() { }

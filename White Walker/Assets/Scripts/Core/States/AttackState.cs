@@ -8,8 +8,10 @@ public class AttackState : BaseState
     public override void EnterState()
     {
        Debug.Log("Entered Attack State");
-        fighter.verticalVelocity = 0f;
-        fighter.velocity = Vector3.zero;
+
+        fighter.Movement.StopHorizontalMovement();
+        fighter.Movement.SetHorizontalMovementEnabled(false);
+
         fighter.ConsumeAttackInput();
 
         PlayAttackAnimation();
@@ -23,9 +25,9 @@ public class AttackState : BaseState
         AnimatorStateInfo info = fighter.animator.GetCurrentAnimatorStateInfo(0);
 
         // --- VENTANA DE CANCELACIÓN ---
-        if (info.normalizedTime > 0.6f)
+        if (info.normalizedTime > 0.8f)
         {
-            if (fighter.GetAttackInput())
+            if (fighter.HasAttackInput())
             {
                 Debug.Log("Input detected for next attack in combo!");
                 AdvanceCombo();
@@ -54,7 +56,7 @@ public class AttackState : BaseState
 
     private void PlayAttackAnimation()
     {
-        AttackBase attack = fighter.currentAttack;
+        AttackData attack = fighter.currentAttack;
 
         if (attack == null)
         {
@@ -81,6 +83,8 @@ public class AttackState : BaseState
 
     public override void ExitState()
     {
+        fighter.Movement.SetHorizontalMovementEnabled(true);
+
         fighter.AnimEvent_CloseHitbox(0);
         fighter.AnimEvent_CloseHitbox(1);
         fighter.AnimEvent_CloseHitbox(2);

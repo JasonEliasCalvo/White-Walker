@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3eee678ec1e0dc94ead313736ad32e44, type: 3}
+  m_Name: Elbow Punching
+  m_EditorClassIdentifier: 
+  attackName: Elbow Punching
+  animationStateName: Elbow Punching
+  damage: 10
+  hitStun: 0.5
+  knockbackForce: 5
+  hitParticle: {fileID: 5880797563127281583, guid: 4747dc22efaaebc48aaad9dca4d18534, type: 3}
+  hitSound: {fileID: 8300000, guid: 43703bff14dd3654ebae6df44abac2de, type: 3}
+  swingSound: {fileID: 0}
+  swingParticlePrefab: {fileID: 0}

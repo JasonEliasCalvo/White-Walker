@@ -7,44 +7,63 @@ public class AirborneState : BaseState
     public override void EnterState()
     {
         Debug.Log("Entered Airborne State");
-        // Usamos un bool en el Animator para las animaciones de caída/salto
-        fighter.animator?.SetBool("IsGrounded", false);
+        fighter.Movement.SetHorizontalMovementEnabled(true);
+        UpdateAirborneAnimation();
     }
 
     public override void UpdateState()
     {
-        // 1. Obtener Input
-        Vector3 moveDir = fighter.GetMovementInput();
+        UpdateAirborneAnimation();
 
-        // 2. Aplicar Movimiento en el aire
-        // En God Hand el control aéreo es limitado. 
-        // Podemos multiplicar la velocidad por un valor pequeño si quieres menos control.
-        float airSpeed = fighter.walkSpeed;
-        fighter.MoveEntity(moveDir, airSpeed);
+        if (!fighter.Movement.IsGrounded)
+            return;
 
-        // 3. Rotación (opcional en el aire, usualmente se permite para orientar el aterrizaje)
-        fighter.RotateEntity(moveDir);
+        HandleLanding();
+    }
 
-        // 4. Verificación de Aterrizaje
-        // Importante: Chequeamos que la velocidad vertical sea hacia abajo o casi cero
-        // para evitar que salga del estado apenas "roce" una rampa al subir.
-        if (fighter.controller.isGrounded && fighter.verticalVelocity <= 0)
+    private void UpdateAirborneAnimation()
+    {
+        bool isFalling = fighter.Movement.VerticalVelocity < -2.1f && !fighter.movement.IsGrounded;
+        fighter.animator?.SetFloat("VerticalVelocity", fighter.Movement.VerticalVelocity);
+
+        if (!isFalling)
+            fighter.animator.CrossFade("Jump", 0.2f);
+        else
+            fighter.animator.CrossFade("Falling", 0.2f);
+
+        fighter.animator?.SetBool("IsFalling",isFalling);
+    }
+
+    private void HandleLanding()
+    {
+        if (fighter.HasAttackInput())
         {
-            if (fighter.GetMovementInput().sqrMagnitude > 0.05f)
+            fighter.ResetCombo();
+
+            if (fighter.moveSet != null && fighter.moveSet.attacks != null && fighter.moveSet.attacks.Count > 0)
             {
-                fighter.ChangeState(fighter.WalkState);
+                fighter.currentAttack = fighter.moveSet.attacks[0];
+                fighter.ChangeState(fighter.AttackState);
             }
-            else
-            {
-                fighter.ChangeState(fighter.IdleState);
-            }
+            return;
+        }
+
+        Vector3 moveDirection = fighter.MovementInput;
+
+        if (moveDirection.sqrMagnitude > 0.01f)
+        {
+            fighter.ChangeState(fighter.WalkState);
+        }
+        else
+        {
+            fighter.ChangeState(fighter.IdleState);
         }
     }
 
     public override void ExitState()
     {
-        // Al salir, avisamos al animator que ya tocamos tierra
-        fighter.animator?.SetBool("IsGrounded", true);
+        fighter.animator?.SetBool("IsFalling", false);
+        fighter.animator?.SetFloat("VerticalVelocity", 0f);
     }
 
     public override void FixedUpdateState()

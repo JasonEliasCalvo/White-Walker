@@ -7,13 +7,14 @@ public class IdleState : BaseState
     public override void EnterState()
     {
         Debug.Log("Entered Idle State");
+
+        fighter.Movement.SetHorizontalMovementEnabled(true);
         fighter.animator?.SetFloat("Speed", 0f);
     }
 
     public override void UpdateState()
     {
-        // 1. Verificar si queremos movernos
-        Vector3 moveDir = fighter.GetMovementInput();
+        Vector3 moveDir = fighter.MovementInput;
 
         if (moveDir.sqrMagnitude > 0.01f)
         {
@@ -21,13 +22,10 @@ public class IdleState : BaseState
             return;
         }
 
-        // 2. Verificar si queremos atacar
-        if (fighter.GetAttackInput())
+        if (fighter.HasAttackInput())
         {
-            // IMPORTANTE: Configurar el inicio del combo aquí
-            fighter.ResetCombo(); // Ponemos index a 0
+            fighter.ResetCombo();
 
-            // Asignamos el primer ataque
             if (fighter.moveSet != null && fighter.moveSet.attacks.Count > 0)
             {
                 fighter.currentAttack = fighter.moveSet.attacks[0];
@@ -36,8 +34,7 @@ public class IdleState : BaseState
             return;
         }
 
-        // 3. Verificar si estamos en el aire
-        if (!fighter.controller.isGrounded && fighter.verticalVelocity <= 0)
+        if (!fighter.Movement.IsGrounded && fighter.Movement.VerticalVelocity <= -4f)
             fighter.ChangeState(fighter.AirborneState);
     }
 

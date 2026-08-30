@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8605792053655320312}
-  - component: {fileID: 5244815391135045783}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -33,28 +32,6 @@ Transform:
   - {fileID: 1793124913714703642}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5244815391135045783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1756258331717772756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f423b8f0b3da79409ee1b0372b238a2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  currentWeapon: 0
-  attackPoint: {fileID: 6440425002400169026}
-  attackRadius: 1
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  maxComboDelay: 1.2
-  gunCooldown: 0.8
-  fullBodyGhostPrefab: {fileID: 0}
-  weaponOnlyGhostPrefab: {fileID: 0}
 --- !u!1 &2978726586070706375
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,7 +261,13 @@ PrefabInstance:
       addedObject: {fileID: 2634531885884801226}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1609695270415687643}
+      addedObject: {fileID: 4863252190236983577}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3459178576057068621}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8504540715476453120}
     - targetCorrespondingSourceObject: {fileID: 1251825164071968341, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4558729478795682798}
@@ -371,13 +354,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1.8
+  m_Height: 1.7
   m_Radius: 0.2
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.9, z: 0}
+  m_Center: {x: 0, y: 0.925, z: 0}
 --- !u!82 &709266314772957926
 AudioSource:
   m_ObjectHideFlags: 0
@@ -488,29 +471,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFighter
   animator: {fileID: 5621153482001348448}
-  controller: {fileID: 4503637875266045392}
-  walkSpeed: 5
-  acceleration: 15
-  deceleration: 20
-  gravity: -9.81
-  rotationSmoothTime: 0.12
-  velocity: {x: 0, y: 0, z: 0}
-  verticalVelocity: 0
+  health: {fileID: 2634531885884801226}
+  movement: {fileID: 4863252190236983577}
+  audioSource: {fileID: 709266314772957926}
+  onDeathEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  inputSource: {fileID: 0}
   rightHandBox: {fileID: 1552370162895339549}
   leftHandBox: {fileID: 7127046533950227991}
   rightFootBox: {fileID: 1770615239926042631}
   leftFootBox: {fileID: 8974026273342477408}
   weaponBox: {fileID: 0}
-  activeCombo: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
-  comboIndex: 0
+  moveSet: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
   currentAttack: {fileID: 0}
-  cameraTransform: {fileID: 8421472312370277668}
-  dashSpeed: 20
-  dashDuration: 0.2
+  defaultMoveSet: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
+  comboIndex: 0
+  playerInput: {fileID: 8504540715476453120}
   dashCooldown: 2
-  dashForceStop: 0.1
-  dashTimer: 0
-  dashCooldownTimer: 0
+  bufferWindow: 1
 --- !u!114 &3087817517711563462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -540,7 +519,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthComponent
   maxHealth: 100
---- !u!114 &1609695270415687643
+--- !u!114 &4863252190236983577
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -549,9 +528,47 @@ MonoBehaviour:
   m_GameObject: {fileID: 1416845214859818912}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9d658a386c81d48458c6a870169b510d, type: 3}
+  m_Script: {fileID: 11500000, guid: 84fda3957cb435d4c807f88798b83d5e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayableAnimationFighter
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterMovement
+  locomotionData: {fileID: 11400000, guid: 7476f477193e48348a483030fe4e7480, type: 2}
+  controller: {fileID: 4503637875266045392}
+  inputSource: {fileID: 8504540715476453120}
+  displacement: {fileID: 3459178576057068621}
+  runtimeData:
+    velocity: {x: 0, y: 0, z: 0}
+    verticalVelocity: 0
+    desiredVelocity: {x: 0, y: 0, z: 0}
+    rotationVelocity: 0
+    isGrounded: 0
+  drawDebugGizmos: 1
+--- !u!114 &3459178576057068621
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee6b68b26639d34f83c0ce10daa099a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDisplacement
+  isActive: 0
+  dodgeData: {fileID: 11400000, guid: 3b3580a1ee2ed2341b8243e58429d449, type: 2}
+--- !u!114 &8504540715476453120
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef662994d000a7048a6bd7cb9359eb14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInputSource
+  cameraTransform: {fileID: 8421472312370277668}
 --- !u!4 &1793124913714703642 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}

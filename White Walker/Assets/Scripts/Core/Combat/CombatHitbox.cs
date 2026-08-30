@@ -10,7 +10,7 @@ public class CombatHitbox : MonoBehaviour
     private FighterEntity owner;
     private Collider myCollider;
     private List<IDamageable> victims = new List<IDamageable>();
-    private AttackBase attackData;
+    private AttackData attackData;
 
     void Awake()
     {
@@ -19,7 +19,7 @@ public class CombatHitbox : MonoBehaviour
         myCollider.enabled = false;
     }
 
-    public void EnableHitbox(float dmg, float stun, float force, AttackBase attack = null)
+    public void EnableHitbox(float dmg, float stun, float force, AttackData attack = null)
     {
         damage = dmg;
         hitStun = stun;
@@ -43,6 +43,7 @@ public class CombatHitbox : MonoBehaviour
 
         if (target == null)
             return;
+
 
         if (victims.Contains(target))
             return;
