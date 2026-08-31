@@ -9,15 +9,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3eee678ec1e0dc94ead313736ad32e44, type: 3}
-  m_Name: Quad Puch
+  m_Script: {fileID: 11500000, guid: 61c1b40791a1b6244ac59c7e5709bded, type: 3}
+  m_Name: Quad Punch
   m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
-  attackName: Quad Punch
+  actionName: Quad Punch
+  actionType: 0
+  inputType: 0
+  inputDirection: 0
   animationStateName: Quad Punch
-  damage: 10
-  hitStun: 0.5
-  knockbackForce: 5
-  hitParticle: {fileID: 5880797563127281583, guid: 4747dc22efaaebc48aaad9dca4d18534, type: 3}
-  hitSound: {fileID: 8300000, guid: 43703bff14dd3654ebae6df44abac2de, type: 3}
+  useMovement: 1
+  lockHorizontalMovement: 0
+  displacement: {fileID: 0}
+  damage: 3
+  hitStun: 0
+  knockbackForce: 1
+  hitParticle: {fileID: 0}
+  hitSound: {fileID: 0}
   swingSound: {fileID: 0}
   swingParticlePrefab: {fileID: 0}

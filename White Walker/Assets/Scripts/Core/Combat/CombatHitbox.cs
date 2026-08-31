@@ -10,7 +10,7 @@ public class CombatHitbox : MonoBehaviour
     private FighterEntity owner;
     private Collider myCollider;
     private List<IDamageable> victims = new List<IDamageable>();
-    private AttackData attackData;
+    private ActionData attackData;
 
     void Awake()
     {
@@ -19,7 +19,7 @@ public class CombatHitbox : MonoBehaviour
         myCollider.enabled = false;
     }
 
-    public void EnableHitbox(float dmg, float stun, float force, AttackData attack = null)
+    public void EnableHitbox(float dmg, float stun, float force, ActionData attack = null)
     {
         damage = dmg;
         hitStun = stun;
@@ -62,13 +62,13 @@ public class CombatHitbox : MonoBehaviour
 
             Debug.Log(
                 $"<color=lime>CREANDO PARTICULA</color> " +
-                $"Ataque: {attackData.attackName} | " +
+                $"Ataque: {attackData.actionName} | " +
                 $"Prefab: {attackData.hitParticle.name} | " +
                 $"Posición: {hitPoint}"
             );
 
             Debug.Log(
-                $"Ataque: {attackData.attackName}"
+                $"Ataque: {attackData.actionName}"
             );
 
             if (attackData.hitParticle != null)
@@ -86,7 +86,7 @@ public class CombatHitbox : MonoBehaviour
             else
             {
                 Debug.LogError(
-                    $"El ataque {attackData.attackName} NO tiene hitParticle."
+                    $"El ataque {attackData.actionName} NO tiene hitParticle."
                 );
             }
 

@@ -1,24 +1,18 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class PlayerFighter : FighterEntity
 {
     [Header("Player")]
     [SerializeField] private PlayerInputSource playerInput;
 
+    [Header("Input Buffer")]
+    [SerializeField] private float inputBufferDuration = 0.25f;
+
+    private InputBuffer inputBuffer;
+
     [Header("Dash")]
-    [SerializeField]
-    private float dashCooldown = 0.8f;
+    [SerializeField] private float dashCooldown = 0.8f;
     private float dashCooldownTimer;
-
-    [Header("Attack Buffer")]
-    [SerializeField]
-    private float bufferWindow = 1f;
-
-    private bool attackBuffer;
-    private float bufferTimer;
-
-    // Estado �nico
-    private float dashCooldownCounter;
 
     protected override void Awake()
     {
@@ -37,7 +31,8 @@ public class PlayerFighter : FighterEntity
             return;
         }
 
-        movement.SetInputSource( playerInput );
+        Movement.SetInputSource( playerInput );
+        inputBuffer = new InputBuffer(inputBufferDuration);
     }
 
     protected override void Start()
@@ -53,94 +48,96 @@ public class PlayerFighter : FighterEntity
 
     protected override void Update()
     {
-        RegisterAttackInput();
+        ReadInputCommands();
+
+        inputBuffer.Update();
 
         base.Update();
 
-        UpdateAttackBuffer();
         HandlePlayerActions();
 
         if (dashCooldownTimer > 0)
             dashCooldownTimer -= Time.deltaTime;
     }
 
-    public override bool HasAttackInput()
+    private void ReadInputCommands()
     {
-        return attackBuffer;
-    }
-
-    public override void ConsumeAttackInput()
-    {
-        attackBuffer = false;
-        bufferTimer = 0f;
-    }
-
-    private void RegisterAttackInput()
-    {
-        if (playerInput != null && playerInput.ConsumeAttackPressed())
-        {
-            attackBuffer = true;
-            bufferTimer = bufferWindow;
-        }
-    }
-
-    private void UpdateAttackBuffer()
-    {
-        if (!attackBuffer)
+        if (playerInput == null)
             return;
 
-        bufferTimer -= Time.deltaTime;
-
-        if (bufferTimer <= 0f)
+        while (playerInput.TryConsumeCommand(out InputCommand command))
         {
-            attackBuffer = false;
-            bufferTimer = 0f;
+            inputBuffer.Add(command);
+
+            Debug.Log(
+                $"INPUT BUFFER → {command.type} | " +
+                $"Direction: {command.direction}"
+            );
         }
     }
 
     private void HandlePlayerActions()
     {
         if (currentState != null && !currentState.CanBeInterrupted)
-        {
-            return;
-        }
-
-        if (playerInput == null)
             return;
 
-        if (movement.IsGrounded && playerInput.ConsumeJumpPressed())
+        if (inputBuffer.TryPeek(out InputCommand command))
         {
-            Debug.Log("ConsumeJumpPressed ");
-            Movement.StartDisplacement( moveSet.jumpDisplacement,Vector3.zero);
-            ChangeState(AirborneState);
-            return;
+            ActionContext context = new ActionContext(
+                Movement.IsGrounded,
+                playerInput.RawMovementInput.magnitude > 0.5f,
+                null
+            );
+
+            ActionData action =
+                actionResolver.Resolve(
+                    command,
+                    context,
+                    moveSet
+                );
+
+            if (action != null)
+            {
+                Debug.Log(
+                    $"ACTION RESOLVED → {action.actionName}"
+                );
+
+                inputBuffer.TryConsume(out command);
+
+                ExecuteAction(action);
+            }
         }
 
-        if (dashCooldownTimer <= 0f && movement.IsGrounded && playerInput.ConsumeDashPressed())
-        {
-            ChangeState(dodgeState);
-            return;
-        }
+        // Interact posteriormente.
+    }
 
-        if (playerInput.ConsumeInteractPressed())
-        {
-            // InteractState posteriormente.
-        }
+    public bool TryConsumeInputCommand(out InputCommand command)
+    {
+        return inputBuffer.TryConsume(out command);
+    }
+
+    public bool TryPeekInputCommand(out InputCommand command)
+    {
+        return inputBuffer.TryPeek(out command);
+    }
+
+    public void ClearInputBuffer()
+    {
+        inputBuffer.Clear();
     }
 
     public void StartDashCooldown()
     {
-        dashCooldownCounter = dashCooldown;
+        dashCooldownTimer = dashCooldown;
     }
-
     private void HandleGameStart()
     {
-        movement.SetHorizontalMovementEnabled(true);
+        Movement.SetHorizontalMovementEnabled(true);
     }
 
     private void HandleGameEnd()
     {
-        movement.StopHorizontalMovement();
-        movement.SetHorizontalMovementEnabled(false);
+        Movement.StopHorizontalMovement();
+        Movement.SetHorizontalMovementEnabled(false);
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,10 +10,8 @@ public class PlayerInputSource : CharacterInputSource
     private PlayerControls controls;
 
     private Vector2 rawMovementInput;
-    private bool attackPressed;
-    private bool dashPressed;
-    private bool interactPressed;
-    private bool jumpPressed;
+
+    private readonly Queue<InputCommand> commandQueue = new();
 
     private void Awake()
     {
@@ -60,22 +59,67 @@ public class PlayerInputSource : CharacterInputSource
 
     private void OnAttackPerformed(InputAction.CallbackContext context)
     {
-        attackPressed = true;
+        EnqueueCommand(InputCommandType.Attack);
     }
 
     private void OnDashPerformed(InputAction.CallbackContext context)
     {
-        dashPressed = true;
+        EnqueueCommand(InputCommandType.Dash);
     }
 
     private void OnJumpPerformed(InputAction.CallbackContext context)
     {
-        jumpPressed = true;
+        EnqueueCommand(InputCommandType.Jump);
     }
 
     private void OnInteractPerformed(InputAction.CallbackContext context)
     {
-        interactPressed = true;
+        EnqueueCommand(InputCommandType.Interact);
+    }
+
+    private void EnqueueCommand(InputCommandType type)
+    {
+        Vector2 movement = rawMovementInput;
+
+        InputDirection direction = GetInputDirection(movement);
+
+        InputCommand command = new InputCommand(
+            type,
+            direction,
+            movement,
+            Time.time
+        );
+
+        commandQueue.Enqueue(command);
+    }
+
+    private InputDirection GetInputDirection(Vector2 input)
+    {
+        const float threshold = 0.25f;
+
+        if (input.sqrMagnitude < threshold * threshold)
+            return InputDirection.None;
+
+        if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
+            return input.x > 0
+                ? InputDirection.Right
+                : InputDirection.Left;
+
+        return input.y > 0
+            ? InputDirection.Forward
+            : InputDirection.Back;
+    }
+
+    public override bool TryConsumeCommand(out InputCommand command)
+    {
+        if (commandQueue.Count == 0)
+        {
+            command = default;
+            return false;
+        }
+
+        command = commandQueue.Dequeue();
+        return true;
     }
 
     public override Vector3 GetMovementDirection()
@@ -110,43 +154,7 @@ public class PlayerInputSource : CharacterInputSource
         return movement.sqrMagnitude > 1f
             ? movement.normalized
             : movement;
-    }
+        }
 
-    public override bool ConsumeAttackPressed()
-    {
-        if (!attackPressed)
-            return false;
-
-        attackPressed = false;
-        return true;
-    }
-
-    public override bool ConsumeDashPressed()
-    {
-        if (!dashPressed)
-            return false;
-
-        dashPressed = false;
-        return true;
-    }
-
-    public override bool ConsumeJumpPressed()
-    {
-        if (!jumpPressed)
-            return false;
-
-        jumpPressed = false;
-        return true;
-    }
-
-    public bool ConsumeInteractPressed()
-    {
-        if (!interactPressed)
-            return false;
-
-        interactPressed = false;
-        return true;
-    }
-
-    public Vector2 RawMovementInput => rawMovementInput;
+   public Vector2 RawMovementInput => rawMovementInput; 
 }

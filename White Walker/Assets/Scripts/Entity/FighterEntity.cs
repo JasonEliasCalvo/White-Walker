@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 
 [RequireComponent(typeof(Animator))]
@@ -10,26 +10,23 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     [Header("Core Components")]
     public Animator animator;
     public HealthComponent health;
-    public CharacterMovement movement;
+    private CharacterMovement movement;
     public AudioSource audioSource;
-    public CharacterMovement Movement => movement;
-
+    protected ActionResolver actionResolver;
+    protected FighterAnimator fighterAnimator;
     public UnityEvent onDeathEnd;
 
     [Header("Input")]
     [SerializeField] protected CharacterInputSource inputSource;
-    public CharacterInputSource InputSource => inputSource;
 
     [Header("State")]
     protected BaseState currentState;
 
-    public IdleState IdleState;
-    public WalkState WalkState;
-    public AirborneState AirborneState;
-    public AttackState AttackState;
+    public LocomotionState LocomotionState { get; private set; }
+    public ActionState ActionState { get; private set; }
+
     public HitState HitState;
     public DeathState DeathState;
-    public DodgeState dodgeState;
 
     [Header("Combat System")]
     public CombatHitbox rightHandBox; // 0
@@ -40,7 +37,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
     [Header("Combo Settings")]
     public MoveSet moveSet;
-    public AttackData currentAttack;
+    public ActionData currentAtion;
     public MoveSet defaultMoveSet;
     [HideInInspector] public int comboIndex = 0;
 
@@ -52,6 +49,11 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         ? inputSource.GetMovementDirection()
         : Vector3.zero;
 
+    public CharacterMovement Movement => movement;
+    public CharacterInputSource InputSource => inputSource;
+    public ActionResolver ActionResolver => actionResolver;
+    public BaseState CurrentState { get => currentState; set => currentState = value; }
+    public FighterAnimator FighterAnimator => fighterAnimator;
     protected virtual void Awake()
     {
         movement = GetComponent<CharacterMovement>();
@@ -59,17 +61,16 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
         inputSource = GetComponent<CharacterInputSource>();
+        actionResolver = new ActionResolver();
+        fighterAnimator = GetComponent<FighterAnimator>();
 
         if (movement != null && inputSource != null)
             movement.SetInputSource(inputSource);
 
-        IdleState = new IdleState(this);
-        WalkState = new WalkState(this);
-        AirborneState = new AirborneState(this);
-        AttackState = new AttackState(this);
+        LocomotionState = new LocomotionState(this);
+        ActionState = new ActionState(this);
         HitState = new HitState(this);
         DeathState = new DeathState(this);
-        dodgeState = new DodgeState(this);
 
         health.OnDeath += HandleDeath;
     }
@@ -79,7 +80,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         if (moveSet == null)
             moveSet = defaultMoveSet;
 
-        ChangeState(IdleState);
+        ChangeState(LocomotionState);
     }
 
     protected virtual void Update()
@@ -148,13 +149,30 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         currentState.EnterState();
     }
 
+    protected virtual void ExecuteAction(ActionData action)
+    {
+        if (action == null)
+            return;
+
+        if (ActionState == null)
+        {
+            Debug.LogError(
+                $"{name}: ActionState no está asignado."
+            );
+
+            return;
+        }
+
+        ActionState.SetAction(action);
+        ChangeState(ActionState);
+    }
+
     public void ResetState()
     {
         currentState?.ExitState();
         currentState?.EnterState();
     }
 
-    // --- STATES ---
     public void ResetCombo()
     {
         comboIndex = 0;
@@ -170,19 +188,19 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
         moveSet = newMoveSet;
         comboIndex = 0;
-        currentAttack = null;
+        currentAtion = null;
 
-        Debug.Log($"{gameObject.name} cambi� a combo: {newMoveSet.name}");
+        Debug.Log($"{gameObject.name} cambió a combo: {newMoveSet.name}");
     }
 
     // --- HITBOX MANAGEMENT ---
     public void AnimEvent_OpenHitbox(int limbIndex)
     {
-        if (currentAttack == null) return;
+        if (currentAtion == null) return;
 
-        float dmg = currentAttack.damage;
-        float stun = currentAttack.hitStun;
-        float knock = currentAttack.knockbackForce;
+        float dmg = currentAtion.damage;
+        float stun = currentAtion.hitStun;
+        float knock = currentAtion.knockbackForce;
 
         CombatHitbox targetBox = GetHitbox(
                    limbIndex
@@ -199,11 +217,11 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
         Debug.Log(
             $"<color=cyan>OPEN HITBOX:</color> {gameObject.name} | " +
-            $"Ataque: {currentAttack.attackName} | " +
+            $"Ataque: {currentAtion.actionName} | " +
             $"Hitbox: {targetBox.gameObject.name}"
         );
 
-        targetBox?.EnableHitbox(dmg, stun, knock, currentAttack);
+        targetBox?.EnableHitbox(dmg, stun, knock, currentAtion);
     }
 
     public void AnimEvent_CloseHitbox(int limbIndex)
@@ -230,15 +248,15 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
     public void AnimEvent_PlaySwingSound()
     {
-        if (currentAttack != null && currentAttack.swingSound != null && audioSource != null)
+        if (currentAtion != null && currentAtion.swingSound != null && audioSource != null)
         {
-            audioSource.PlayOneShot(currentAttack.swingSound);
+            audioSource.PlayOneShot(currentAtion.swingSound);
         }
     }
 
     public void AnimEvent_SpawnAttackParticle(int limbIndex)
     {
-        if (currentAttack == null || currentAttack.swingParticlePrefab == null) return;
+        if (currentAtion == null || currentAtion.swingParticlePrefab == null) return;
 
         Transform targetTransform = transform;
 
@@ -251,7 +269,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
             case 4: if (weaponBox != null) targetTransform = weaponBox.transform; break;
         }
 
-        GameObject vfx = Instantiate(currentAttack.swingParticlePrefab, targetTransform.position, targetTransform.rotation);
+        GameObject vfx = Instantiate(currentAtion.swingParticlePrefab, targetTransform.position, targetTransform.rotation);
         Destroy(vfx, 2f);
     }
 
@@ -261,10 +279,5 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         {
             audioSource.PlayOneShot(clip);
         }
-    }
-
-    public abstract bool HasAttackInput();
-    public virtual void ConsumeAttackInput()
-    {
     }
 }

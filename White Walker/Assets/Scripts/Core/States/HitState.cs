@@ -21,7 +21,7 @@ public class HitState : BaseState
         timer -= Time.deltaTime;
         if (timer <= 0)
         {
-            fighter.ChangeState(fighter.IdleState);
+            fighter.ChangeState(fighter.LocomotionState);
         }
     }
 

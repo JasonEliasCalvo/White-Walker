@@ -5,7 +5,7 @@ using UnityEngine;
 public class MoveSet : ScriptableObject
 {
     [Header("Attacks")]
-    public List<AttackData> attacks;
+    public List<ActionData> actions;
 
     [Header("Displacements")]
     public DisplacementData dodgeDisplacement;
