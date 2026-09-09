@@ -25,6 +25,7 @@ public class LocomotionData : ScriptableObject
 
     [Header("Gravity")]
     public float gravity = -9.81f;
+    public float fallGravityMultiplier = 1.8f;
 
     [Min(0f)]
     public float terminalVelocity = 30f;

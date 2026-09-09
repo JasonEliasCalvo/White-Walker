@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public enum InputCommandType
@@ -8,13 +9,16 @@ public enum InputCommandType
     Interact
 }
 
+[Flags]
 public enum InputDirection
 {
-    None,
-    Forward,
-    Back,
-    Left,
-    Right
+    None = 1 << 0, // 1
+    Forward = 1 << 1, // 2
+    Back = 1 << 2, // 4
+    Left = 1 << 3, // 8
+    Right = 1 << 4, // 16
+
+    Any = None | Forward | Back | Left | Right
 }
 
 public struct InputCommand

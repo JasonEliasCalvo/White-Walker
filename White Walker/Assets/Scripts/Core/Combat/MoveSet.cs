@@ -6,8 +6,4 @@ public class MoveSet : ScriptableObject
 {
     [Header("Attacks")]
     public List<ActionData> actions;
-
-    [Header("Displacements")]
-    public DisplacementData dodgeDisplacement;
-    public DisplacementData jumpDisplacement;
 }

@@ -9,7 +9,7 @@ public enum DisplacementType
 
 [CreateAssetMenu(
     fileName = "New Displacement",
-    menuName = "Combat/Movement/Displacement Data"
+    menuName = "Action/Movement/Displacement Data"
 )]
 public class DisplacementData : ScriptableObject
 {

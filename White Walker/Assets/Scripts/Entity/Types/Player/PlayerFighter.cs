@@ -46,15 +46,13 @@ public class PlayerFighter : FighterEntity
         }
     }
 
-    protected override void Update()
+    protected void Update()
     {
         ReadInputCommands();
 
         inputBuffer.Update();
 
-        base.Update();
-
-        HandlePlayerActions();
+        ProcessActionInput();
 
         if (dashCooldownTimer > 0)
             dashCooldownTimer -= Time.deltaTime;
@@ -76,37 +74,38 @@ public class PlayerFighter : FighterEntity
         }
     }
 
-    private void HandlePlayerActions()
+    private void ProcessActionInput()
     {
-        if (currentState != null && !currentState.CanBeInterrupted)
+        if (Reactions.IsReacting)
             return;
 
-        if (inputBuffer.TryPeek(out InputCommand command))
+        if (Actions.IsActive)
         {
-            ActionContext context = new ActionContext(
-                Movement.IsGrounded,
-                playerInput.RawMovementInput.magnitude > 0.5f,
-                null
-            );
-
-            ActionData action =
-                actionResolver.Resolve(
-                    command,
-                    context,
-                    moveSet
-                );
-
-            if (action != null)
-            {
-                Debug.Log(
-                    $"ACTION RESOLVED → {action.actionName}"
-                );
-
-                inputBuffer.TryConsume(out command);
-
-                ExecuteAction(action);
-            }
+            // Más adelante aquí tendremos
+            // cancel windows.
+            return;
         }
+
+        if (!inputBuffer.TryPeek(out InputCommand command))
+            return;
+
+        ActionContext context =
+            new ActionContext(Locomotion, MovementInput, Actions.CurrentAction, false);
+
+        ActionData action =
+            actionResolver.Resolve( command, context, moveSet);
+
+        if (action == null)
+            return;
+
+        inputBuffer.TryConsume( out command);
+
+        Debug.Log(
+            $"ACTION RESOLVED → " +
+            $"{action.actionName}"
+        );
+
+        ExecuteAction(action, context);
 
         // Interact posteriormente.
     }

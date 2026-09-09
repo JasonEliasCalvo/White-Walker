@@ -1,4 +1,14 @@
+using System;
 using UnityEngine;
+
+[Flags]
+public enum MovementLockSource
+{
+    None = 0,
+    Action = 1 << 0,
+    Reaction = 1 << 1,
+    External = 1 << 2
+}
 
 [RequireComponent(typeof(CharacterController))]
 public class CharacterMovement : MonoBehaviour
@@ -17,6 +27,8 @@ public class CharacterMovement : MonoBehaviour
     [Header("Debug")]
     [SerializeField] private bool drawDebugGizmos = true;
 
+    private MovementLockSource movementLocks = MovementLockSource.None;
+
     public LocomotionData LocomotionData => locomotionData;
     public CharacterController Controller => controller;
     public MovementRuntimeData RuntimeData => runtimeData;
@@ -26,23 +38,25 @@ public class CharacterMovement : MonoBehaviour
         get => runtimeData.verticalVelocity;
         set => runtimeData.verticalVelocity = value;
     }
-
     public bool IsGrounded =>
         controller != null && controller.isGrounded;
 
-    private bool horizontalMovementEnabled = true;
+    public bool IsHorizontalMovementLocked =>
+        movementLocks != MovementLockSource.None;
+
+    public bool IsHorizontalMovementEnabled =>
+        movementLocks == MovementLockSource.None;
 
     public CharacterDisplacement Displacement => displacement;
 
-    public bool IsDisplacing => displacement != null && displacement.IsActive;
+    public bool IsDisplacing =>
+        displacement != null && displacement.IsActive;
 
     private void Reset()
     {
-        controller =
-            GetComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
 
-        displacement =
-            GetComponent<CharacterDisplacement>();
+        displacement = GetComponent<CharacterDisplacement>();
     }
 
     private void Awake()
@@ -83,12 +97,13 @@ public class CharacterMovement : MonoBehaviour
         CalculateDesiredVelocity(inputDirection);
         CalculateHorizontalVelocity(deltaTime);
         CalculateVerticalVelocity(deltaTime, useGravity);
+
         ApplyMovement(deltaTime, displacementDelta);
     }
 
     private Vector3 GetInputDirection()
     {
-        if (!horizontalMovementEnabled)
+        if (!IsHorizontalMovementEnabled)
             return Vector3.zero;
 
         if (inputSource == null)
@@ -145,22 +160,6 @@ public class CharacterMovement : MonoBehaviour
         );
     }
 
-    public void SetHorizontalMovementEnabled(bool enabled)
-    {
-        horizontalMovementEnabled = enabled;
-
-        if (!enabled)
-        {
-            runtimeData.desiredVelocity = Vector3.zero;
-
-            runtimeData.velocity = new Vector3(
-                0f,
-                runtimeData.velocity.y,
-                0f
-            );
-        }
-    }
-
     private void CalculateVerticalVelocity(float deltaTime, bool useGravity)
     {
         if (!useGravity)
@@ -169,13 +168,16 @@ public class CharacterMovement : MonoBehaviour
         if (controller.isGrounded)
         {
             if (runtimeData.verticalVelocity < 0f)
-                runtimeData.verticalVelocity =
-                    locomotionData.groundedVerticalVelocity;
+                runtimeData.verticalVelocity = locomotionData.groundedVerticalVelocity;
         }
         else
         {
-            runtimeData.verticalVelocity +=
-                locomotionData.gravity * deltaTime;
+            float currentGravity = locomotionData.gravity;
+
+            if (runtimeData.verticalVelocity < 0f)
+                currentGravity *= locomotionData.fallGravityMultiplier;
+
+            runtimeData.verticalVelocity += currentGravity * deltaTime;
 
             runtimeData.verticalVelocity = Mathf.Max(
                 runtimeData.verticalVelocity,
@@ -228,8 +230,40 @@ public class CharacterMovement : MonoBehaviour
             Quaternion.Euler(0f, angle, 0f);
     }
 
-    public bool StartDisplacement(
-        DisplacementData data,Vector3 direction){
+    // --- MOVEMENT CONTROL ---
+    public void SetMovementLock(MovementLockSource source, bool locked)
+    {
+        if (locked)
+            movementLocks |= source;
+        else
+            movementLocks &= ~source;
+
+        if (IsHorizontalMovementLocked)
+        {
+            StopHorizontalMovement();
+        }
+    }
+
+    public void SetHorizontalMovementEnabled(bool enabled)
+    {
+        SetMovementLock(MovementLockSource.External,
+            !enabled
+        );
+    }
+
+    public void StopHorizontalMovement()
+    {
+        runtimeData.velocity = new Vector3(
+            0f,
+            runtimeData.velocity.y,
+            0f
+        );
+
+        runtimeData.desiredVelocity =
+            Vector3.zero;
+    }
+
+    public bool StartDisplacement(DisplacementData data,Vector3 direction){
         if (Displacement == null)
             return false;
 
@@ -244,7 +278,7 @@ public class CharacterMovement : MonoBehaviour
         Displacement?.StopDisplacement();
     }
 
-    // --- SET ---
+    // --- EXTERNAL SETTERS ---
     public void SetInputSource(CharacterInputSource source)
     {
         inputSource = source;
@@ -263,17 +297,6 @@ public class CharacterMovement : MonoBehaviour
     public void AddVerticalVelocity(float amount)
     {
         runtimeData.verticalVelocity += amount;
-    }
-
-    public void StopHorizontalMovement()
-    {
-        runtimeData.velocity = new Vector3(
-            0f,
-            runtimeData.velocity.y,
-            0f
-        );
-
-        runtimeData.desiredVelocity = Vector3.zero;
     }
 
     private void ValidateSetup()
