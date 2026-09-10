@@ -4,10 +4,10 @@
 public class ActionSystem : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private CharacterMovement movement;
-    [SerializeField] private LocomotionSystem locomotion;
-    [SerializeField] private FighterAnimator fighterAnimator;
-    [SerializeField] private FighterEntity fighter;
+    private CharacterMovement movement;
+    private LocomotionSystem locomotion;
+    private FighterAnimator fighterAnimator;
+    private FighterEntity fighter;
 
     [Header("Runtime")]
     public ActionData CurrentAction { get; private set; }

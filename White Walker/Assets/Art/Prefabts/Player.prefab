@@ -268,6 +268,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8504540715476453120}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2920463687015059709}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4647866326262477023}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5214742337359527752}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2417030974445572411}
     - targetCorrespondingSourceObject: {fileID: 1251825164071968341, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4558729478795682798}
@@ -382,7 +394,7 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 1
+  MinDistance: 0.32176805
   MaxDistance: 500
   Pan2D: 0
   rolloffMode: 0
@@ -472,8 +484,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerFighter
   animator: {fileID: 5621153482001348448}
   health: {fileID: 2634531885884801226}
-  movement: {fileID: 4863252190236983577}
   audioSource: {fileID: 709266314772957926}
+  movement: {fileID: 4863252190236983577}
+  locomotionSystem: {fileID: 0}
+  actionSystem: {fileID: 0}
+  reactionSystem: {fileID: 0}
+  fighterAnimator: {fileID: 0}
   onDeathEnd:
     m_PersistentCalls:
       m_Calls: []
@@ -484,12 +500,10 @@ MonoBehaviour:
   leftFootBox: {fileID: 8974026273342477408}
   weaponBox: {fileID: 0}
   moveSet: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
-  currentAttack: {fileID: 0}
   defaultMoveSet: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
-  comboIndex: 0
   playerInput: {fileID: 8504540715476453120}
+  inputBufferDuration: 0.25
   dashCooldown: 2
-  bufferWindow: 1
 --- !u!114 &3087817517711563462
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -555,7 +569,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CharacterDisplacement
   isActive: 0
-  dodgeData: {fileID: 11400000, guid: 3b3580a1ee2ed2341b8243e58429d449, type: 2}
 --- !u!114 &8504540715476453120
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -569,6 +582,60 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInputSource
   cameraTransform: {fileID: 8421472312370277668}
+--- !u!114 &2920463687015059709
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a42d501db0ed4d4dbf2ba74c8c62c79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FighterAnimator
+--- !u!114 &4647866326262477023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a38fbb67361fc1c48a6b26cd0666ae94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionSystem
+--- !u!114 &5214742337359527752
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d587af28eab54db46bb0016b999451bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReactionSystem
+--- !u!114 &2417030974445572411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416845214859818912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84aaaf4d5c7020d4b921ff42446e0338, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocomotionSystem
+  movementThreshold: 0.05
+  verticalThreshold: 0.15
+  coyoteDuration: 0.15
+  idleAnimState: Idle
+  moveAnimState: Move
+  fallAnimState: Fall
 --- !u!4 &1793124913714703642 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}

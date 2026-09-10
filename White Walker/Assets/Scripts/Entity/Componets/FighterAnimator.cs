@@ -3,10 +3,15 @@ using UnityEngine;
 
 public class FighterAnimator : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    private Animator animator;
 
     private string currentStateName;
     public bool IsActionPlaying { get; private set; }
+
+    public void Awake()
+    {
+        if (animator == null) animator = GetComponent<Animator>();
+    }
 
     public void PlayLocomotionState(string stateName, float crossfadeDuration = 0.1f)
     {

@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &317763427226793325
 Transform:
   m_ObjectHideFlags: 0
@@ -105,6 +105,9 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 4740547095745771048}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8598568212060600753}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
@@ -115,10 +118,22 @@ PrefabInstance:
       addedObject: {fileID: 4064051765522365789}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4740547095745771048}
+      addedObject: {fileID: 163317558449092507}
     - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 163317558449092507}
+      addedObject: {fileID: 6055833634098320281}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7223080306615534570}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8798454740034554249}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7920492438795092552}
+    - targetCorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 112936698882058109}
   m_SourcePrefab: {fileID: 100100000, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
 --- !u!95 &3467792122192869749 stripped
 Animator:
@@ -135,72 +150,6 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: 3409e18f5c4d75444a7ad501bf4b19db, type: 3}
   m_PrefabInstance: {fileID: 2004283807409717013}
   m_PrefabAsset: {fileID: 0}
---- !u!143 &8598568212060600753
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7561905061093598748}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &4500316392097071004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7561905061093598748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c6a04009889c2e4094721620c14ab62, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyFighter
-  animator: {fileID: 3467792122192869749}
-  health: {fileID: 0}
-  movement: {fileID: 0}
-  audioSource: {fileID: 0}
-  onDeath:
-    m_PersistentCalls:
-      m_Calls: []
-  rightHandBox: {fileID: 0}
-  leftHandBox: {fileID: 0}
-  rightFootBox: {fileID: 0}
-  leftFootBox: {fileID: 0}
-  weaponBox: {fileID: 0}
-  moveSet: {fileID: 0}
-  currentAttack: {fileID: 0}
-  defaultMoveSet: {fileID: 0}
-  comboIndex: 0
---- !u!114 &4064051765522365789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7561905061093598748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b65b3f1129400934b837d46d766fb3fc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HealthComponent
-  maxHealth: 100
 --- !u!82 &4740547095745771048
 AudioSource:
   m_ObjectHideFlags: 0
@@ -298,6 +247,75 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!143 &8598568212060600753
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &4500316392097071004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6a04009889c2e4094721620c14ab62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyFighter
+  animator: {fileID: 3467792122192869749}
+  health: {fileID: 0}
+  audioSource: {fileID: 0}
+  movement: {fileID: 0}
+  locomotionSystem: {fileID: 0}
+  actionSystem: {fileID: 0}
+  reactionSystem: {fileID: 0}
+  fighterAnimator: {fileID: 0}
+  onDeathEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  inputSource: {fileID: 0}
+  rightHandBox: {fileID: 0}
+  leftHandBox: {fileID: 0}
+  rightFootBox: {fileID: 0}
+  leftFootBox: {fileID: 0}
+  weaponBox: {fileID: 0}
+  moveSet: {fileID: 0}
+  defaultMoveSet: {fileID: 0}
+--- !u!114 &4064051765522365789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b65b3f1129400934b837d46d766fb3fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealthComponent
+  maxHealth: 100
 --- !u!114 &163317558449092507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -313,6 +331,7 @@ MonoBehaviour:
   locomotionData: {fileID: 11400000, guid: 7476f477193e48348a483030fe4e7480, type: 2}
   controller: {fileID: 8598568212060600753}
   inputSource: {fileID: 0}
+  displacement: {fileID: 0}
   runtimeData:
     velocity: {x: 0, y: 0, z: 0}
     verticalVelocity: 0
@@ -320,3 +339,70 @@ MonoBehaviour:
     rotationVelocity: 0
     isGrounded: 0
   drawDebugGizmos: 1
+--- !u!114 &6055833634098320281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ee6b68b26639d34f83c0ce10daa099a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterDisplacement
+  isActive: 0
+--- !u!114 &7223080306615534570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a42d501db0ed4d4dbf2ba74c8c62c79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FighterAnimator
+--- !u!114 &8798454740034554249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a38fbb67361fc1c48a6b26cd0666ae94, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActionSystem
+--- !u!114 &7920492438795092552
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d587af28eab54db46bb0016b999451bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ReactionSystem
+--- !u!114 &112936698882058109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7561905061093598748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84aaaf4d5c7020d4b921ff42446e0338, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocomotionSystem
+  movementThreshold: 0.05
+  verticalThreshold: 0.15
+  coyoteDuration: 0.15
+  idleAnimState: Idle
+  moveAnimState: Move
+  fallAnimState: Fall

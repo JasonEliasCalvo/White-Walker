@@ -11,6 +11,7 @@ public enum MovementLockSource
 }
 
 [RequireComponent(typeof(CharacterController))]
+[RequireComponent(typeof(CharacterDisplacement))]
 public class CharacterMovement : MonoBehaviour
 {
     [Header("Configuration")]

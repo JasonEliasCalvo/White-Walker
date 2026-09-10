@@ -226,7 +226,31 @@ public class CameraManager : MonoBehaviour
 }
 
 ============================================================
-ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Combat\ActionContext.cs
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\ActionCondition.cs
+============================================================
+using System;
+
+[Serializable]
+public abstract class ActionCondition
+{
+    public abstract bool IsMet(ActionContext context);
+}
+
+[Serializable]
+public class GroundedCondition : ActionCondition
+{
+    public bool allowCoyoteTime = false;
+
+    public override bool IsMet(ActionContext context)
+    {
+        if (context.isGrounded) return true;
+        if (allowCoyoteTime && context.isCoyoteActive) return true;
+        return false;
+    }
+}
+
+============================================================
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\ActionContext.cs
 ============================================================
 using UnityEngine;
 
@@ -242,6 +266,9 @@ public struct ActionContext
     public bool isBusy;
     public bool hasTarget;
 
+    public bool isGrounded;
+    public bool isCoyoteActive;
+
     public ActionContext(
         LocomotionSystem locomotion,
         Vector3 movementDirection,
@@ -256,29 +283,18 @@ public struct ActionContext
 
         isBusy = currentAction != null;
         this.hasTarget = hasTarget;
+
+        isGrounded = locomotion.IsGrounded;
+        isCoyoteActive = locomotion.IsCoyoteActive;
     }
 }
 
 ============================================================
-ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Combat\ActionData.cs
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\ActionData.cs
 ============================================================
+using System;
+using System.Collections.Generic;
 using UnityEngine;
-
-public enum ActionType
-{
-    Attack,
-    Jump,
-    Dash,
-    Special,
-    Other
-}
-
-public enum ActionAnimationMode
-{
-    Single,
-    LocomotionDriven,
-    Sequence
-}
 
 [CreateAssetMenu(fileName = "New Action", menuName = "Combat/Action")]
 public class ActionData : ScriptableObject
@@ -289,38 +305,133 @@ public class ActionData : ScriptableObject
 
     [Header("Input")]
     public InputCommandType inputType;
-    public InputDirection inputDirection;
-
-    [Header("Timing")]
-    [Min(0f)]
-    public float duration = 0.5f;
+    public InputDirection allowedDirections;
 
     [Header("Animation")]
     public string animationStateName;
+    public float duration = 0.1f;
 
     [Header("Movimiento")]
-    public bool useMovement = true;
     public bool lockHorizontalMovement = false;
 
-    public DisplacementData displacement;
+    [Header("Condiciones para Ejecutar")]
+    [SerializeReference, SubclassSelector] public List<ActionCondition> conditions = new List<ActionCondition>();
 
-    [Header("Vertical Movement")]
-    public float verticalImpulse;
+    [Header("Efectos al Ejecutar")]
+    [SerializeReference, SubclassSelector] public List<ActionEffect> effects = new List<ActionEffect>();
+}
 
-    [Header("Combate")]
-    public float damage = 0f;
-    public float hitStun = 0f;
-    public float knockbackForce = 0f;
+public enum ActionType
+{
+    Attack,
+    Displacement,
+    Special,
+    Other
+}
 
-    [Header("VFX & SFX")]
-    public GameObject hitParticle;
-    public AudioClip hitSound;
-    public AudioClip swingSound;
-    public GameObject swingParticlePrefab;
+public enum ActionState
+{
+    Disónible,
+    Cooldown,
+    Activa
 }
 
 ============================================================
-ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Combat\ActionSystem.cs
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\ActionEffect.cs
+============================================================
+using System;
+using UnityEngine;
+
+[Serializable]
+public abstract class ActionEffect
+{
+    public abstract void Execute(GameObject user, ActionContext context);
+}
+
+[Serializable]
+public class DisplacementEffct : ActionEffect
+{
+    public DisplacementData displacement;
+
+    public override void Execute(GameObject user, ActionContext context)
+    {
+        if (displacement == null) return;
+
+        if (user.TryGetComponent<CharacterMovement>(out var movement))
+        {
+            Vector3 direction = movement.RuntimeData.desiredVelocity;
+
+            if (direction.sqrMagnitude < 0.01f)
+                direction = user.transform.forward;
+
+            movement.StartDisplacement(displacement, direction.normalized);
+        }
+    }
+}
+
+
+[Serializable]
+public class DamageEffect : ActionEffect
+{
+    public AttackData attackData;
+    public override void Execute(GameObject user, ActionContext context)
+    {
+
+    }
+}
+
+============================================================
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\ActionResolver.cs
+============================================================
+public class ActionResolver
+{
+    public ActionData Resolve(InputCommand command, ActionContext context, MoveSet moveSet)
+    {
+        if (moveSet == null || moveSet.actions == null)
+            return null;
+
+        for (int i = 0; i < moveSet.actions.Count; i++)
+        {
+            ActionData action = moveSet.actions[i];
+
+            if (action == null)
+                continue;
+
+            if (action.inputType != command.type)
+                continue;
+
+            if (!IsDirectionValid(action.allowedDirections, command.direction))
+                continue;
+
+            if (!IsContextValid(action, context))
+                continue;
+
+            return action;
+        }
+
+        return null;
+    }
+    private bool IsContextValid( ActionData action, ActionContext context)
+    {
+        for (int i = 0; i < action.conditions.Count; i++)
+        {
+            if (action.conditions[i] == null) continue;
+
+            if (!action.conditions[i].IsMet(context))
+                return false;
+        }
+
+        return true;
+    }
+
+    private bool IsDirectionValid(InputDirection allowedDirections, InputDirection inputDirection)
+    {
+        return (allowedDirections & inputDirection) != 0;
+    }
+}
+
+============================================================
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\ActionSystem.cs
 ============================================================
 using UnityEngine;
 
@@ -342,17 +453,10 @@ public class ActionSystem : MonoBehaviour
 
     private void Awake()
     {
-        if (movement == null)
-            movement = GetComponent<CharacterMovement>();
-
-        if (locomotion == null)
-            locomotion = GetComponent<LocomotionSystem>();
-
-        if (fighterAnimator == null)
-            fighterAnimator = GetComponent<FighterAnimator>();
-
-        if (fighter == null)
-            fighter = GetComponent<FighterEntity>();
+        if (movement == null) movement = GetComponent<CharacterMovement>();
+        if (locomotion == null) locomotion = GetComponent<LocomotionSystem>();
+        if (fighterAnimator == null) fighterAnimator = GetComponent<FighterAnimator>();
+        if (fighter == null) fighter = GetComponent<FighterEntity>();
     }
 
     private void Update()
@@ -363,66 +467,41 @@ public class ActionSystem : MonoBehaviour
         UpdateAction(Time.deltaTime);
     }
 
-    public bool StartAction(ActionData action)
+    public bool StartAction(ActionData action, ActionContext context)
     {
         if (action == null)
         {
-            Debug.LogWarning(
-                $"{name}: Se intentó ejecutar una acción null.",
-                this
-            );
-
+            Debug.LogWarning($"{name}: Se intentó ejecutar una acción null.", this);
             return false;
         }
 
         if (IsActive)
-        {
             InterruptAction();
-        }
 
         CurrentAction = action;
         actionTimer = 0f;
 
-        Debug.Log(
-            $"{name} → ACTION → {action.actionName}"
-        );
+        Debug.Log( $"{name} → ACTION → {action.actionName}");
 
-        movement.SetMovementLock( MovementLockSource.Action,
-            action.lockHorizontalMovement
-        );
+        movement.SetMovementLock(MovementLockSource.Action, action.lockHorizontalMovement);
 
-        if (action.displacement != null)
+        for (int i = 0; i < action.effects.Count; i++)
         {
-            Vector3 direction = movementDirection();
-
-            if (direction.sqrMagnitude < 0.01f)
-                direction = transform.forward;
-
-            movement.StartDisplacement(
-                action.displacement,
-                direction.normalized
-            );
+            if (action.effects[i] != null)
+                action.effects[i].Execute(gameObject, context);
         }
 
         if (action.animationStateName != null && action.animationStateName != "")
-        {
-            fighterAnimator?.PlayAction(
-                action.animationStateName
-            );
-        }
+            fighterAnimator?.PlayAction(action.animationStateName);
 
         fighterAnimator?.SetActionPlaying(true);
-
         return true;
     }
 
     private void UpdateAction(float deltaTime)
     {
         actionTimer += deltaTime;
-
-        float duration = GetActionDuration();
-
-        if (actionTimer >= duration)
+        if (actionTimer >= GetActionDuration())
         {
             EndAction();
         }
@@ -430,13 +509,8 @@ public class ActionSystem : MonoBehaviour
 
     private float GetActionDuration()
     {
-        if (CurrentAction == null)
-            return 0f;
-
-        if (CurrentAction.duration > 0f)
-            return CurrentAction.duration;
-
-        return 0.5f;
+        if (CurrentAction == null) return 0f;
+        return CurrentAction.duration > 0f ? CurrentAction.duration : 0.5f;
     }
 
     public void EndAction()
@@ -444,14 +518,9 @@ public class ActionSystem : MonoBehaviour
         if (!IsActive)
             return;
 
-        Debug.Log(
-            $"{name} → ACTION END → {CurrentAction.actionName}"
-        );
+        Debug.Log($"{name} → ACTION END → {CurrentAction.actionName}");
 
         CleanupAction();
-
-        CurrentAction = null;
-        actionTimer = 0f;
     }
 
     public void InterruptAction()
@@ -471,27 +540,18 @@ public class ActionSystem : MonoBehaviour
 
     private void CleanupAction()
     {
-        movement.SetMovementLock(
-            MovementLockSource.Action,
-            false
-        );
-
+        movement.SetMovementLock(MovementLockSource.Action, false);
         movement.StopDisplacement();
-
         CloseHitboxes();
 
         CurrentAction = null;
-        fighter.FighterAnimator.SetActionPlaying(false);
+        actionTimer = 0f;
+
+        if (fighter != null && fighter.FighterAnimator != null)
+        {
+            fighter.FighterAnimator.SetActionPlaying(false);
+        }
     }
-
-    private Vector3 movementDirection()
-    {
-        if (movement == null)
-            return transform.forward;
-
-        return movement.RuntimeData.desiredVelocity;
-    }
-
 
     private void CloseHitboxes()
     {
@@ -507,6 +567,34 @@ public class ActionSystem : MonoBehaviour
 }
 
 ============================================================
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\AttackData.cs
+============================================================
+using UnityEngine;
+
+[CreateAssetMenu(
+    fileName = "New Attack",
+    menuName = "Action/Attack"
+)]
+public class AttackData : ScriptableObject
+{
+    [Header("Combate")]
+    public float damage = 0f;
+    public float hitStun = 0f;
+    public float knockbackForce = 0f;
+
+    [Header("VFX & SFX")]
+    public GameObject hitParticle;
+    public AudioClip hitSound;
+}
+
+============================================================
+ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Action\SubclassSelectorAttribute.cs
+============================================================
+using UnityEngine;
+
+public class SubclassSelectorAttribute : PropertyAttribute { }
+
+============================================================
 ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Core\Combat\CombatHitbox.cs
 ============================================================
 using System.Collections;
@@ -517,103 +605,94 @@ public class CombatHitbox : MonoBehaviour
 {
     private float damage;
     private float hitStun;
+    private float knockbackForce;
 
     private FighterEntity owner;
     private Collider myCollider;
     private List<IDamageable> victims = new List<IDamageable>();
-    private ActionData attackData;
+
+    private AttackData attackData;
+    private ActionData actionData;
 
     void Awake()
     {
         myCollider = GetComponent<Collider>();
         owner = GetComponentInParent<FighterEntity>();
-        myCollider.enabled = false;
+
+        if (myCollider != null)
+            myCollider.enabled = false;
     }
 
-    public void EnableHitbox(float dmg, float stun, float force, ActionData attack = null)
+    public void EnableHitbox(AttackData attack, ActionData action = null)
     {
-        damage = dmg;
-        hitStun = stun;
+        if (attack == null)
+        {
+            Debug.LogError($"{gameObject.name}: Se intentó activar la hitbox sin AttackData.", this);
+            return;
+        }
 
         attackData = attack;
+        actionData = action;
+
+        damage = attack.damage;
+        hitStun = attack.hitStun;
+        knockbackForce = attack.knockbackForce;
 
         victims.Clear();
-        myCollider.enabled = true;
+
+        if (myCollider != null)
+            myCollider.enabled = true;
     }
 
     public void DisableHitbox()
     {
-        myCollider.enabled = false;
+        if (myCollider != null)
+            myCollider.enabled = false;
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (owner != null && other.gameObject == owner.gameObject) return;
-
-        IDamageable target = other.GetComponent<IDamageable>();
-
-        if (target == null)
+        if (owner != null && other.gameObject == owner.gameObject)
             return;
 
-
-        if (victims.Contains(target))
+        IDamageable target = other.GetComponent<IDamageable>();
+        if (target == null || victims.Contains(target))
             return;
 
         victims.Add(target);
 
-        Vector3 hitPoint = myCollider.ClosestPoint(
-       other.bounds.center);
+        Vector3 hitPoint = myCollider.ClosestPoint(other.bounds.center);
 
         if (attackData != null)
         {
-            Debug.Log(
-                $"<color=yellow>HIT:</color> " +
-                $"{owner.gameObject.name} -> {other.gameObject.name}"
-            );
+            string actionName = actionData != null ? actionData.actionName : "Acción Desconocida";
 
-            Debug.Log(
-                $"<color=lime>CREANDO PARTICULA</color> " +
-                $"Ataque: {attackData.actionName} | " +
-                $"Prefab: {attackData.hitParticle.name} | " +
-                $"Posición: {hitPoint}"
-            );
-
-            Debug.Log(
-                $"Ataque: {attackData.actionName}"
-            );
+            Debug.Log($"<color=yellow>HIT:</color> {owner.gameObject.name} -> {other.gameObject.name}");
 
             if (attackData.hitParticle != null)
             {
                 Debug.Log(
-                    $"PARTICULA: {attackData.hitParticle.name}"
+                    $"<color=lime>CREANDO PARTICULA</color> " +
+                    $"Ataque: {actionName} | " +
+                    $"Prefab: {attackData.hitParticle.name} | " +
+                    $"Posición: {hitPoint}"
                 );
 
-                Instantiate(
-                    attackData.hitParticle,
-                    hitPoint,
-                    Quaternion.identity
-                );
+                Instantiate(attackData.hitParticle, hitPoint, Quaternion.identity);
             }
             else
             {
-                Debug.LogError(
-                    $"El ataque {attackData.actionName} NO tiene hitParticle."
-                );
+                Debug.LogWarning($"El ataque '{actionName}' no tiene asignado un hitParticle en su AttackData.");
             }
 
             if (attackData.hitSound != null)
             {
-                AudioSource.PlayClipAtPoint(
-                    attackData.hitSound,
-                    hitPoint
-                );
+                AudioSource.PlayClipAtPoint(attackData.hitSound, hitPoint);
             }
         }
         else
         {
-            Debug.LogError(
-                $"attackData es NULL en {owner.gameObject.name}"
-            );
+            Debug.LogError($"attackData es NULL en la Hitbox de {owner.gameObject.name}");
         }
 
         // 3. APLICAR DAÑO
@@ -632,10 +711,6 @@ public class MoveSet : ScriptableObject
 {
     [Header("Attacks")]
     public List<ActionData> actions;
-
-    [Header("Displacements")]
-    public DisplacementData dodgeDisplacement;
-    public DisplacementData jumpDisplacement;
 }
 
 ============================================================
@@ -1139,13 +1214,16 @@ public class CharacterMovement : MonoBehaviour
         if (controller.isGrounded)
         {
             if (runtimeData.verticalVelocity < 0f)
-                runtimeData.verticalVelocity =
-                    locomotionData.groundedVerticalVelocity;
+                runtimeData.verticalVelocity = locomotionData.groundedVerticalVelocity;
         }
         else
         {
-            runtimeData.verticalVelocity +=
-                locomotionData.gravity * deltaTime;
+            float currentGravity = locomotionData.gravity;
+
+            if (runtimeData.verticalVelocity < 0f)
+                currentGravity *= locomotionData.fallGravityMultiplier;
+
+            runtimeData.verticalVelocity += currentGravity * deltaTime;
 
             runtimeData.verticalVelocity = Mathf.Max(
                 runtimeData.verticalVelocity,
@@ -1199,7 +1277,6 @@ public class CharacterMovement : MonoBehaviour
     }
 
     // --- MOVEMENT CONTROL ---
-
     public void SetMovementLock(MovementLockSource source, bool locked)
     {
         if (locked)
@@ -1231,8 +1308,6 @@ public class CharacterMovement : MonoBehaviour
         runtimeData.desiredVelocity =
             Vector3.zero;
     }
-
-    // --- MOVEMENT CONTROL ---
 
     public bool StartDisplacement(DisplacementData data,Vector3 direction){
         if (Displacement == null)
@@ -1361,7 +1436,7 @@ public enum DisplacementType
 
 [CreateAssetMenu(
     fileName = "New Displacement",
-    menuName = "Combat/Movement/Displacement Data"
+    menuName = "Action/Movement/Displacement Data"
 )]
 public class DisplacementData : ScriptableObject
 {
@@ -1422,6 +1497,7 @@ public class LocomotionData : ScriptableObject
 
     [Header("Gravity")]
     public float gravity = -9.81f;
+    public float fallGravityMultiplier = 1.8f;
 
     [Min(0f)]
     public float terminalVelocity = 30f;
@@ -1459,20 +1535,24 @@ public enum LocomotionSubPhase
 [RequireComponent(typeof(CharacterMovement))]
 public class LocomotionSystem : MonoBehaviour
 {
+    [Header("References")]
+    [SerializeField] private CharacterMovement movement;
+    [SerializeField] private FighterAnimator fighterAnimator;
+    [SerializeField] private ActionSystem actionSystem;
+
     [Header("Current Locomotion")]
     public LocomotionPhase Phase { get; private set; }
-
     public LocomotionSubPhase SubPhase { get; private set; }
+
 
     [Header("Runtime")]
     public bool IsGrounded { get; private set; }
+    public bool IsCoyoteActive => coyoteTimer > 0f;
     public bool IsAirborne { get; private set; }
 
     public bool IsMoving { get; private set; }
     public bool IsRising { get; private set; }
     public bool IsFalling { get; private set; }
-
-    private CharacterMovement movement;
 
     [SerializeField]
     private float movementThreshold = 0.05f;
@@ -1480,107 +1560,80 @@ public class LocomotionSystem : MonoBehaviour
     [SerializeField]
     private float verticalThreshold = 0.15f;
 
+    [Header("Coyote Time")]
+    [SerializeField] private float coyoteDuration = 0.15f;
+    private float coyoteTimer;
+
+    [Header("Nombres de Animaciones")]
+    [SerializeField] private string idleAnimState = "Idle";
+    [SerializeField] private string moveAnimState = "Move";
+    [SerializeField] private string fallAnimState = "Fall";
+
     private void Awake()
     {
-        movement = GetComponent<CharacterMovement>();
-
-        if (movement == null)
-        {
-            Debug.LogError(
-                $"{name}: LocomotionSystem necesita CharacterMovement.",
-                this
-            );
-        }
+        if (movement == null) movement = GetComponent<CharacterMovement>();
+        if (fighterAnimator == null) fighterAnimator = GetComponent<FighterAnimator>();
+        if (actionSystem == null) actionSystem = GetComponent<ActionSystem>();
     }
 
     private void Update()
     {
-        UpdateLocomotion();
+        UpdateGroundedAndCoyote();
+        UpdateLocomotionPhases();
+
+        if (actionSystem == null || !actionSystem.IsActive)
+        {
+            UpdateLocomotionAnimations();
+        }
     }
 
-    private void UpdateLocomotion()
+    private void UpdateGroundedAndCoyote()
     {
         IsGrounded = movement.IsGrounded;
-        IsAirborne = !IsGrounded;
 
-        Vector3 velocity = movement.RuntimeData.velocity;
-
-        Vector3 horizontalVelocity = velocity;
-        horizontalVelocity.y = 0f;
-
-        IsMoving =
-            IsGrounded &&
-            horizontalVelocity.sqrMagnitude >
-            movementThreshold * movementThreshold;
-
-        IsRising =
-            IsAirborne &&
-            movement.VerticalVelocity > verticalThreshold;
-
-        IsFalling =
-            IsAirborne &&
-            movement.VerticalVelocity < -verticalThreshold;
-
-        Phase = IsGrounded
-            ? LocomotionPhase.Grounded
-            : LocomotionPhase.Airborne;
-
-        SubPhase = ResolveSubPhase();
+        if (IsGrounded)
+            coyoteTimer = coyoteDuration;
+        else
+            coyoteTimer -= Time.deltaTime;
     }
 
-    private LocomotionSubPhase ResolveSubPhase()
+    private void UpdateLocomotionPhases()
     {
+        float verticalVel = movement.VerticalVelocity;
+        float horizontalSpeed = movement.RuntimeData.desiredVelocity.magnitude;
+
         if (IsGrounded)
         {
-            return IsMoving
-                ? LocomotionSubPhase.Moving
-                : LocomotionSubPhase.Idle;
+            Phase = LocomotionPhase.Grounded;
+            SubPhase = horizontalSpeed > 0.1f ? LocomotionSubPhase.Moving : LocomotionSubPhase.Idle;
         }
-
-        if (IsRising)
-            return LocomotionSubPhase.Rising;
-
-        if (IsFalling)
-            return LocomotionSubPhase.Falling;
-
-        return LocomotionSubPhase.Suspended;
-    }
-}
-
-============================================================
-ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Entity\ActionResolver.cs
-============================================================
-public class ActionResolver
-{
-    public ActionData Resolve(InputCommand command, ActionContext context, MoveSet moveSet)
-    {
-        if (moveSet == null || moveSet.actions == null)
-            return null;
-
-        for (int i = 0; i < moveSet.actions.Count; i++)
+        else
         {
-            ActionData action = moveSet.actions[i];
-
-            if (action == null)
-                continue;
-
-            if (action.inputType != command.type)
-                continue;
-
-            if (action.inputDirection != command.direction)
-                continue;
-
-            if (!IsContextValid(action, context))
-                continue;
-
-            return action;
+            Phase = LocomotionPhase.Airborne;
+            SubPhase = verticalVel > 0.1f ? LocomotionSubPhase.Rising : LocomotionSubPhase.Falling;
         }
-
-        return null;
     }
-    private bool IsContextValid( ActionData action, ActionContext context)
+
+    private void UpdateLocomotionAnimations()
     {
-        return true;
+        if (Phase == LocomotionPhase.Grounded)
+        {
+            if (SubPhase == LocomotionSubPhase.Moving)
+            {
+                fighterAnimator.PlayLocomotionState(moveAnimState);
+            }
+            else
+            {
+                fighterAnimator.PlayLocomotionState(idleAnimState);
+            }
+        }
+        else if (Phase == LocomotionPhase.Airborne)
+        {
+            if (SubPhase == LocomotionSubPhase.Falling)
+            {
+                fighterAnimator.PlayLocomotionState(fallAnimState);
+            }
+        }
     }
 }
 
@@ -1708,68 +1761,47 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
         if (reactionSystem.CurrentReaction == ReactionSystem.ReactionState.Dead)
             return;
 
-        health.ApplyDamage(
-            health.CurrentHealth
-        );
+        health.ApplyDamage( health.CurrentHealth);
     }
 
     // --- ACTIONS ---
-    public bool ExecuteAction(
-         ActionData action)
+    public bool ExecuteAction(ActionData action, ActionContext context)
     {
-        return actionSystem.StartAction(
-            action
-        );
+        return actionSystem.StartAction(action, context);
     }
 
     // --- HITBOXES ---
     public void AnimEvent_OpenHitbox(int limbIndex)
     {
-        ActionData action =
-            actionSystem.CurrentAction;
+        ActionData action = actionSystem.CurrentAction;
+        if (action == null) return;
 
-        if (action == null)
-            return;
-
-        float damage = action.damage;
-        float stun = action.hitStun;
-        float knockback = action.knockbackForce;
-
-        CombatHitbox target = GetHitbox(limbIndex);
-
-        if (target == null)
+        DamageEffect damageEffect = null;
+        for (int i = 0; i < action.effects.Count; i++)
         {
-            Debug.LogError(
-                $"{gameObject.name}: No existe CombatHitbox para limbIndex {limbIndex}."
-            );
-
-            return;
+            if (action.effects[i] is DamageEffect effect)
+            {
+                damageEffect = effect;
+                break;
+            }
         }
 
-        Debug.Log(
-            $"<color=cyan>OPEN HITBOX:</color> {gameObject.name} | " +
-            $"Ataque: {actionSystem.CurrentAction.actionName} | " +
-            $"Hitbox: {target.gameObject.name}"
-        );
+        if (damageEffect == null || damageEffect.attackData == null) return;
 
-        target.EnableHitbox(
-            damage,
-            stun,
-            knockback,
-            action
-        );
+        CombatHitbox target = GetHitbox(limbIndex);
+        if (target == null) return;
+
+        target.EnableHitbox(damageEffect.attackData, action);
     }
 
     public void AnimEvent_CloseHitbox(int limbIndex)
     {
-        CombatHitbox targetBox =
-                    GetHitbox(limbIndex);
+        CombatHitbox targetBox = GetHitbox(limbIndex);
 
         targetBox?.DisableHitbox();
     }
 
-    private CombatHitbox GetHitbox(
-       int limbIndex)
+    private CombatHitbox GetHitbox( int limbIndex)
     {
         return limbIndex switch
         {
@@ -1784,32 +1816,15 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 
     public void AnimEvent_PlaySwingSound()
     {
-        ActionData action =
-                    actionSystem.CurrentAction;
+        ActionData action = actionSystem.CurrentAction;
 
         if (action == null)
             return;
-
-        if (action.swingSound != null &&
-            audioSource != null)
-        {
-            audioSource.PlayOneShot(
-                action.swingSound
-            );
-        }
     }
 
     public void AnimEvent_SpawnAttackParticle(int limbIndex)
     {
-        ActionData action =
-          actionSystem.CurrentAction;
-
-        if (action == null ||
-            action.swingParticlePrefab == null)
-        {
-            return;
-        }
-
+        ActionData action = actionSystem.CurrentAction;
         Transform targetTransform = transform;
 
         switch (limbIndex)
@@ -1820,15 +1835,6 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
             case 3: if (leftFootBox != null) targetTransform = leftFootBox.transform; break;
             case 4: if (weaponBox != null) targetTransform = weaponBox.transform; break;
         }
-
-        GameObject vfx =
-            Instantiate(
-                action.swingParticlePrefab,
-                targetTransform.position,
-                targetTransform.rotation
-            );
-        
-        Destroy(vfx, 2f);
     }
 
     public void AnimEvent_PlayAudioDirect(AudioClip clip)
@@ -1843,131 +1849,43 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
 ============================================================
 ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Entity\Componets\FighterAnimator.cs
 ============================================================
+using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
 
 public class FighterAnimator : MonoBehaviour
 {
-    private FighterEntity fighter;
-    private Animator animator;
-    private CharacterMovement movement;
+    [SerializeField] private Animator animator;
 
-    private static readonly int SpeedHash = Animator.StringToHash("Speed");
-    private static readonly int VerticalVelocityHash = Animator.StringToHash("VerticalVelocity");
-    private static readonly int IsGroundedHash = Animator.StringToHash("IsGrounded");
-    private static readonly int IsFallingHash = Animator.StringToHash("IsFalling");
-    private static readonly int IsActionHash = Animator.StringToHash("IsAction");
+    private string currentStateName;
+    public bool IsActionPlaying { get; private set; }
 
-    private void Awake()
+    public void PlayLocomotionState(string stateName, float crossfadeDuration = 0.1f)
     {
-        fighter = GetComponent<FighterEntity>();
-        animator = GetComponent<Animator>();
-        movement = GetComponent<CharacterMovement>();
-
-        if (fighter == null)
-            Debug.LogError($"{name}: FighterAnimator necesita FighterEntity.", this);
-
-        if (animator == null)
-            Debug.LogError($"{name}: FighterAnimator necesita Animator.", this);
-
-        if (movement == null)
-            Debug.LogError($"{name}: FighterAnimator necesita CharacterMovement.", this);
-    }
-
-    private void Update()
-    {
-        if (animator == null || movement == null)
+        if (IsActionPlaying)
             return;
 
-        UpdateLocomotionParameters();
+        if (currentStateName == stateName)
+            return;
+
+        currentStateName = stateName;
+        animator.CrossFade(stateName, crossfadeDuration);
     }
 
-    private void UpdateLocomotionParameters()
+    public void PlayAction(string stateName, float crossfadeDuration = 0.05f)
     {
-        Vector3 input = fighter.MovementInput;
-        float speed = input.magnitude;
-        bool grounded = movement.IsGrounded;
+        if (animator == null)
+            return;
 
-        float verticalVelocity =
-            movement.VerticalVelocity;
+        if (string.IsNullOrEmpty(stateName))
+            return;
 
-        bool falling = !grounded && verticalVelocity < -2f;
-
-        animator.SetFloat(
-            SpeedHash,
-            speed
-        );
-
-        animator.SetBool(
-            IsGroundedHash,
-            grounded
-        );
-
-        animator.SetFloat(
-            VerticalVelocityHash,
-            verticalVelocity
-        );
-
-        animator.SetBool(
-            IsFallingHash,
-            falling
-        );
+        currentStateName = stateName;
+        animator.CrossFade(stateName, crossfadeDuration);
     }
+
     public void SetActionPlaying(bool value)
     {
-        animator.SetBool(
-            IsActionHash,
-            value
-        );
-    }
-
-    public void PlayAction(string animationStateName)
-    {
-        if (animator == null)
-            return;
-
-        if (string.IsNullOrEmpty(animationStateName))
-            return;
-
-        int layer =
-            animator.GetLayerIndex("Base Layer");
-
-        if (layer < 0)
-        {
-            Debug.LogError(
-                $"{name}: No existe Base Layer.",
-                this
-            );
-
-            return;
-        }
-
-        string statePath =
-            "Base Layer." +
-            animationStateName;
-
-        int stateHash =
-            Animator.StringToHash(
-                statePath
-            );
-
-        if (!animator.HasState(
-            layer,
-            stateHash))
-        {
-            Debug.LogError(
-                $"{name}: Animator no tiene " +
-                $"el estado '{statePath}'.",
-                this
-            );
-
-            return;
-        }
-
-        animator.CrossFade(
-            stateHash,
-            0.05f,
-            layer
-        );
+        IsActionPlaying = value;
     }
 }
 
@@ -2093,6 +2011,7 @@ public class InputBuffer
 ============================================================
 ARCHIVO: H:\Projecto\Git\White-Walker\White Walker\Assets\Scripts\Entity\Input\InputCommand.cs
 ============================================================
+using System;
 using UnityEngine;
 
 public enum InputCommandType
@@ -2103,13 +2022,16 @@ public enum InputCommandType
     Interact
 }
 
+[Flags]
 public enum InputDirection
 {
-    None,
-    Forward,
-    Back,
-    Left,
-    Right
+    None = 1 << 0, // 1
+    Forward = 1 << 1, // 2
+    Back = 1 << 2, // 4
+    Left = 1 << 3, // 8
+    Right = 1 << 4, // 16
+
+    Any = None | Forward | Back | Left | Right
 }
 
 public struct InputCommand
@@ -2231,40 +2153,26 @@ public class PlayerFighter : FighterEntity
             return;
         }
 
-        if (!inputBuffer.TryPeek(
-            out InputCommand command))
-        {
+        if (!inputBuffer.TryPeek(out InputCommand command))
             return;
-        }
 
         ActionContext context =
-            new ActionContext(
-                Locomotion,
-                MovementInput,
-                Actions.CurrentAction,
-                false
-            );
+            new ActionContext(Locomotion, MovementInput, Actions.CurrentAction, false);
 
         ActionData action =
-            actionResolver.Resolve(
-                command,
-                context,
-                moveSet
-            );
+            actionResolver.Resolve( command, context, moveSet);
 
         if (action == null)
             return;
 
-        inputBuffer.TryConsume(
-            out command
-        );
+        inputBuffer.TryConsume( out command);
 
         Debug.Log(
             $"ACTION RESOLVED → " +
             $"{action.actionName}"
         );
 
-        ExecuteAction(action);
+        ExecuteAction(action, context);
 
         // Interact posteriormente.
     }

@@ -19,9 +19,9 @@ public enum LocomotionSubPhase
 public class LocomotionSystem : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private CharacterMovement movement;
-    [SerializeField] private FighterAnimator fighterAnimator;
-    [SerializeField] private ActionSystem actionSystem;
+    private CharacterMovement movement;
+    private FighterAnimator fighterAnimator;
+    private ActionSystem actionSystem;
 
     [Header("Current Locomotion")]
     public LocomotionPhase Phase { get; private set; }

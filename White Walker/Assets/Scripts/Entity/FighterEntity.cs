@@ -1,14 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-[RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(AudioSource))]
-[RequireComponent(typeof(ActionSystem))]
-[RequireComponent(typeof(ReactionSystem))]
-[RequireComponent(typeof(HealthComponent))]
-[RequireComponent(typeof(CharacterMovement))]
-[RequireComponent(typeof(LocomotionSystem))]
-[RequireComponent(typeof(FighterAnimator))]
 public abstract class FighterEntity : MonoBehaviour, IDamageable
 {
     [Header("Core Components")]
