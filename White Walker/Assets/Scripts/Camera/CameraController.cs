@@ -14,7 +14,8 @@ public class CameraController : MonoBehaviour
     public GameObject playerMesh;
 
     [Header("Ajustes de Cámara Sobre el Hombro")]
-    public float verticalLimit = 72f;
+    public float maxverticalLimit = 72f;
+    public float minverticalLimit = 72f;
     public float maxDistance = 7f;
     public float minDistance = 1.5f;
 
@@ -58,6 +59,8 @@ public class CameraController : MonoBehaviour
 
         angle.x += hor * sensitivity.x;
         angle.y -= ver * sensitivity.y;
+
+        angle.y = Mathf.Clamp(angle.y, -minverticalLimit, maxverticalLimit);
 
         // Zoom
         float scrollDelta = Input.GetAxis("Mouse ScrollWheel");

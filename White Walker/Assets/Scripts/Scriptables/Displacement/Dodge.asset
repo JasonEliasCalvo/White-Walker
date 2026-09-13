@@ -17,6 +17,7 @@ MonoBehaviour:
   distance: 3
   verticalDistance: 2
   height: 2
+  distanceForParabola: 2
   progressCurve:
     serializedVersion: 2
     m_Curve:

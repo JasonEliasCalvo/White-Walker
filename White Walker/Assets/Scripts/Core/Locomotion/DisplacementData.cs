@@ -14,8 +14,7 @@ public enum DisplacementType
 public class DisplacementData : ScriptableObject
 {
     [Header("Type")]
-    public DisplacementType displacementType =
-        DisplacementType.Linear;
+    public DisplacementType displacementType = DisplacementType.Linear;
 
     [Header("Timing")]
     [Min(0.01f)]
