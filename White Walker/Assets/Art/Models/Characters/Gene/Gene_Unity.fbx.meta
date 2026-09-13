@@ -1,0 +1,260 @@
+fileFormatVersion: 2
+guid: a1996b9bff3e3bf4f9f74495d9fa7afe
+ModelImporter:
+  serializedVersion: 24200
+  internalIDToNameTable: []
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_arm.001
+    second: {fileID: 2100000, guid: 03aebcff6b431774e89c8e65b7151e45, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_armPowerOff.001
+    second: {fileID: 2100000, guid: e90e599deb1d55d49af0de2f3dd97c8b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_armPowerOn.001
+    second: {fileID: 2100000, guid: 29437399589f9984abbd9ccc38fefba5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_boots.001
+    second: {fileID: 2100000, guid: 3bbca7ddf327fe543aedda1a05ed8852, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_burrs.001
+    second: {fileID: 2100000, guid: b9797e049cdc70140a3700d359b2a25c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_coat.001
+    second: {fileID: 2100000, guid: c79979f313d371144b26bf5faef0e254, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_deisticBrace.001
+    second: {fileID: 2100000, guid: c0d73835c6f2dee419faa704cd8cdbc9, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_detail.001
+    second: {fileID: 2100000, guid: c4b08e1c9afb80849bd6476cbae1eaa4, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_eyeball.001
+    second: {fileID: 2100000, guid: 4b6cc4e10f2f1e142bc7c94f8f6229d3, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_fabric.001
+    second: {fileID: 2100000, guid: 52111fe290061a44ca38faca420e2260, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_face.001
+    second: {fileID: 2100000, guid: fee0490f7beaae54ab12dfc7d9c3bd0d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_hair.001
+    second: {fileID: 2100000, guid: 874091c17aadf6945963a24639480eb0, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_handGlove.001
+    second: {fileID: 2100000, guid: 094b3075ff2002c4fb613aca69d99e81, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_handPowerOff.001
+    second: {fileID: 2100000, guid: ee62d8bed46e86442ba3d0aae2fe1f20, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: M_gene_handPowerOn.001
+    second: {fileID: 2100000, guid: 42b2d63bacc418f4a89f031673a2238f, type: 2}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_arm
+    second: {fileID: 2800000, guid: 06155501afe8dcb409ed629be8b72afb, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_arm_powerOff
+    second: {fileID: 2800000, guid: 854962dd2864bdd41819e0d65e8e43b3, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_arm_powerOn
+    second: {fileID: 2800000, guid: bb678dfdf0a586d4f88ffe8e95d60937, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_boots
+    second: {fileID: 2800000, guid: d1adb57ebac169b40967590b0fb185f6, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_burr
+    second: {fileID: 2800000, guid: 45ec323b12b211846984b68f86205d33, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_coat
+    second: {fileID: 2800000, guid: 583b9a26c50b8434cb662bbe43f8a24e, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_deisticBrace
+    second: {fileID: 2800000, guid: 762532fa195f6354aaf8935e2b791c45, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_detail
+    second: {fileID: 2800000, guid: 094fb17ec6102b84fbb29f1b619bbe24, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_eye
+    second: {fileID: 2800000, guid: 1b4729d9ed6e98a449ec961efa7040ee, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_fabric
+    second: {fileID: 2800000, guid: 5c73eb4bfab3e2d45b8856c83e0fff6c, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_face
+    second: {fileID: 2800000, guid: 32b0edbddca57a3438d58cab7b306bf4, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_hair
+    second: {fileID: 2800000, guid: 238bfd64df42523439e5cdcb9bd2c73a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_handGloves_Fix
+    second: {fileID: 2800000, guid: fde77684722c8ee4d848e08cde2be69a, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_handPowerOff_fix
+    second: {fileID: 2800000, guid: 5790222fa85e5e94a94000a6aece24b5, type: 3}
+  - first:
+      type: UnityEngine:Texture2D
+      assembly: UnityEngine.CoreModule
+      name: T_gene_handPowerOn_Fix
+    second: {fileID: 2800000, guid: 508e50ba48b798146a00b878757fdfcc, type: 3}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    generateMeshLods: 0
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

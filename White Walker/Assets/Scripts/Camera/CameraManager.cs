@@ -6,7 +6,6 @@ public class CameraManager : MonoBehaviour
     public static CameraManager instance;
     public GameObject basicCam;
     public GameObject combatCam;
-    public GameObject topDownCam;
 
     public Camera manualCamera;
     public CinemachineCamera cinematicCam;
@@ -15,7 +14,6 @@ public class CameraManager : MonoBehaviour
     {
         Basic,
         Combat,
-        Topdown,
         Cinematic
     }
 
@@ -38,18 +36,15 @@ public class CameraManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchCameraStyle(CameraStyle.Basic);
         if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchCameraStyle(CameraStyle.Combat);
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SwitchCameraStyle(CameraStyle.Topdown);
     }
 
     public void SwitchCameraStyle(CameraStyle newStyle)
     {
         basicCam.SetActive(false);
         combatCam.SetActive(false);
-        topDownCam.SetActive(false);
 
         if (newStyle == CameraStyle.Basic) basicCam.SetActive(true);
         if (newStyle == CameraStyle.Combat) combatCam.SetActive(true);
-        if (newStyle == CameraStyle.Topdown) topDownCam.SetActive(true);
 
         currentStyle = newStyle;
     }

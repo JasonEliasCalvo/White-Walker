@@ -15,6 +15,7 @@ public abstract class FighterEntity : MonoBehaviour, IDamageable
     [SerializeField] protected ReactionSystem reactionSystem;
     [SerializeField] protected FighterAnimator fighterAnimator;
 
+    [Space(10)]
     public UnityEvent onDeathEnd;
 
     [Header("Input")]

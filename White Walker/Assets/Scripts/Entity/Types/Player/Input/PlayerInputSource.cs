@@ -154,7 +154,7 @@ public class PlayerInputSource : CharacterInputSource
         return movement.sqrMagnitude > 1f
             ? movement.normalized
             : movement;
-        }
+    }
 
-   public Vector2 RawMovementInput => rawMovementInput; 
+    public Vector2 RawMovementInput => rawMovementInput;
 }

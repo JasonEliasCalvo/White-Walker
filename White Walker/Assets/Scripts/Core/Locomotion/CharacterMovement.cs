@@ -56,7 +56,6 @@ public class CharacterMovement : MonoBehaviour
     private void Reset()
     {
         controller = GetComponent<CharacterController>();
-
         displacement = GetComponent<CharacterDisplacement>();
     }
 
@@ -196,9 +195,7 @@ public class CharacterMovement : MonoBehaviour
                 runtimeData.velocity.z
             ) * deltaTime;
 
-        Vector3 finalMovement =
-            normalMovement +
-            displacementDelta;
+        Vector3 finalMovement = normalMovement + displacementDelta;
 
         if (controller.enabled)
             controller.Move(finalMovement);

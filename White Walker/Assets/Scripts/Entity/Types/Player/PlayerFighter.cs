@@ -2,8 +2,7 @@
 
 public class PlayerFighter : FighterEntity
 {
-    [Header("Player")]
-    [SerializeField] private PlayerInputSource playerInput;
+    private PlayerInputSource playerInput;
 
     [Header("Input Buffer")]
     [SerializeField] private float inputBufferDuration = 0.25f;

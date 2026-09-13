@@ -32,37 +32,6 @@ Transform:
   - {fileID: 1793124913714703642}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2978726586070706375
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6440425002400169026}
-  m_Layer: 0
-  m_Name: Attack Point
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6440425002400169026
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2978726586070706375}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.1699998, z: 0.8199997}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1793124913714703642}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6394223169942622001
 GameObject:
   m_ObjectHideFlags: 0
@@ -240,9 +209,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
       addedObject: {fileID: 412492704778259827}
-    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 6440425002400169026}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 36078ab0369161e49a29d349ae3e0739, type: 3}
       insertIndex: -1
@@ -486,14 +452,14 @@ MonoBehaviour:
   health: {fileID: 2634531885884801226}
   audioSource: {fileID: 709266314772957926}
   movement: {fileID: 4863252190236983577}
-  locomotionSystem: {fileID: 0}
-  actionSystem: {fileID: 0}
-  reactionSystem: {fileID: 0}
-  fighterAnimator: {fileID: 0}
+  locomotionSystem: {fileID: 2417030974445572411}
+  actionSystem: {fileID: 4647866326262477023}
+  reactionSystem: {fileID: 5214742337359527752}
+  fighterAnimator: {fileID: 2920463687015059709}
   onDeathEnd:
     m_PersistentCalls:
       m_Calls: []
-  inputSource: {fileID: 0}
+  inputSource: {fileID: 8504540715476453120}
   rightHandBox: {fileID: 1552370162895339549}
   leftHandBox: {fileID: 7127046533950227991}
   rightFootBox: {fileID: 1770615239926042631}
@@ -501,7 +467,6 @@ MonoBehaviour:
   weaponBox: {fileID: 0}
   moveSet: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
   defaultMoveSet: {fileID: 11400000, guid: bb0a4fbf661f4bd4387510b17f51a86b, type: 2}
-  playerInput: {fileID: 8504540715476453120}
   inputBufferDuration: 0.25
   dashCooldown: 2
 --- !u!114 &3087817517711563462
